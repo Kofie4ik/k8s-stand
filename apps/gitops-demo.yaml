@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: gitops-demo
+  namespace: argocd
+spec:
+  project: default
+
+  # откуда брать желаемое состояние
+  source:
+    repoURL: https://github.com/Kofie4ik/k8s-stand.git
+    targetRevision: main
+    path: manifests/gitops-demo
+
+  # куда его применять
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: gitops-demo
+
+  syncPolicy:
+    # automated намеренно НЕ включаем: сначала смотрим diff глазами
+    syncOptions:
+      - CreateNamespace=true
