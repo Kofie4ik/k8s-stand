@@ -1,0 +1,18 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: gitops-demo
+  namespace: gitops-demo
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: gitops.pivasik.org
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: gitops-demo
+                port:
+                  number: 80
