@@ -17,5 +17,7 @@ spec:
     server: https://kubernetes.default.svc
     namespace: app-demo
 
-  # automated включим после проверки
-  syncPolicy: {}
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
