@@ -17,7 +17,9 @@ spec:
     server: https://kubernetes.default.svc
     namespace: sites
 
-  # automated пока НЕ включаем — сначала глазами
   syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
     syncOptions:
       - CreateNamespace=true
