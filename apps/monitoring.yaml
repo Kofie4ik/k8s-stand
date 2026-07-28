@@ -1,0 +1,32 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: monitoring        # ← имя релиза Helm, менять нельзя
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+
+  sources:
+    - repoURL: https://prometheus-community.github.io/helm-charts
+      chart: kube-prometheus-stack
+      targetRevision: 87.19.0
+      helm:
+        valueFiles:
+          - $values/helm-values/values-monitoring.yaml
+
+    - repoURL: https://github.com/Kofie4ik/k8s-stand.git
+      targetRevision: main
+      ref: values
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
+
+  syncPolicy:
+    syncOptions:
+      # применяем через API-сервер, а не kubectl-apply:
+      # CRD prometheus-operator'а не влезают в аннотацию last-applied-configuration (лимит 256 КБ)
+      - ServerSideApply=true
+    # automated включим после проверки
