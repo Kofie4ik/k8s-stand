@@ -10,7 +10,7 @@ data:
     <head><meta charset="utf-8"><title>GitOps demo</title></head>
     <body style="font-family:sans-serif;text-align:center;padding-top:15vh">
       <h1>GitOps demo</h1>
-      <p>Версия страницы: <b>v3</b></p>
+      <p>Версия страницы: <b>v4</b></p>
       <p>Эта страница приехала из git, а не из kubectl.</p>
     </body>
     </html>
