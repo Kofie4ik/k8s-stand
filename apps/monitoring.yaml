@@ -29,4 +29,8 @@ spec:
       # применяем через API-сервер, а не kubectl-apply:
       # CRD prometheus-operator'а не влезают в аннотацию last-applied-configuration (лимит 256 КБ)
       - ServerSideApply=true
-    # automated включим после проверки
+    automated:
+      # prune намеренно НЕ включаем: приложение владеет CRD prometheus-operator,
+      # их удаление каскадно унесёт все ServiceMonitor/PrometheusRule в кластере
+      prune: false
+      selfHeal: true
