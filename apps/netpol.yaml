@@ -1,0 +1,15 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: netpol
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/Kofie4ik/k8s-stand
+    targetRevision: main
+    path: manifests/netpol
+  destination:
+    server: https://kubernetes.default.svc
