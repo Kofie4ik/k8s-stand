@@ -1,5 +1,8 @@
 grafana:
-  adminPassword: "P@ssw0rd"          # смени на свой
+  admin:
+    existingSecret: grafana-admin
+    userKey: admin-user
+    passwordKey: admin-password          # смени на свой
   ingress:
     enabled: true
     ingressClassName: traefik
