@@ -5,6 +5,7 @@ namespace: monitoring
 
 resources:
   - loki-datasource.yaml
+  - grafana-admin.yaml
 
 configMapGenerator:
   - name: grafana-dashboard-loki
