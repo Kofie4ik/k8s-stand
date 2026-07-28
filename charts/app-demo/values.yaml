@@ -1,0 +1,21 @@
+postgres:
+  image: postgres:16-alpine
+  db: demodb
+  user: demo
+  # пароля здесь нет: Secret pg-secret создаётся вручную и в git не хранится
+  storage: 2Gi
+
+adminer:
+  image: adminer:4
+  replicaCount: 1
+
+ingress:
+  enabled: true
+  host: db.pivasik.org
+  className: traefik
+
+hpa:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 5
+  targetCPU: 50

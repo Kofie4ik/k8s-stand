@@ -1,0 +1,6 @@
+apiVersion: v2
+name: app-demo
+description: PostgreSQL (StatefulSet) + Adminer — учебная связка со стенда
+type: application
+version: 0.1.0
+appVersion: "1.0"

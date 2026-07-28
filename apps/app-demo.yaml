@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: app-demo         # ← имя релиза Helm, менять нельзя
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/Kofie4ik/k8s-stand.git
+    targetRevision: main
+    path: charts/app-demo
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: app-demo
+
+  # automated включим после проверки
+  syncPolicy: {}
