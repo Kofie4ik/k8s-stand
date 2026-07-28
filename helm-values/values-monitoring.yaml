@@ -1,0 +1,24 @@
+grafana:
+  adminPassword: "P@ssw0rd"          # смени на свой
+  ingress:
+    enabled: true
+    ingressClassName: traefik
+    hosts:
+      - grafana.pivasik.org
+
+prometheus:
+  prometheusSpec:
+    retention: 7d
+    resources:
+      requests: { memory: "400Mi", cpu: "200m" }
+      limits:   { memory: "1Gi",   cpu: "1" }
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 10Gi
+
+alertmanager:
+  enabled: false
