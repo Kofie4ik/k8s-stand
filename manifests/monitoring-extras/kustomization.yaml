@@ -6,7 +6,6 @@ namespace: monitoring
 resources:
   - loki-datasource.yaml
 
-# дашборд собирается из обычного .json — править его теперь можно коммитом
 configMapGenerator:
   - name: grafana-dashboard-loki
     files:
@@ -16,6 +15,15 @@ configMapGenerator:
         grafana_dashboard: "1"
       annotations:
         grafana_folder: "Логи"
+
+  - name: grafana-dashboard-postgres
+    files:
+      - postgres.json=dashboards/postgres.json
+    options:
+      labels:
+        grafana_dashboard: "1"
+      annotations:
+        grafana_folder: "Базы данных"
 
 generatorOptions:
   disableNameSuffixHash: true
