@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>pivasik craft — игровой сервер</title>
+<style>
+  :root{--bg:#0b1120;--card:rgba(255,255,255,.06);--stroke:rgba(255,255,255,.12);
+    --text:#e6edf3;--muted:#8b98a5;--green:#4ade80;--acc:#22d3ee}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color:var(--text);
+    min-height:100vh;padding:40px 20px;display:flex;flex-direction:column;align-items:center;
+    background:radial-gradient(900px 500px at 15% -10%,#14532d 0%,transparent 55%),
+      radial-gradient(900px 500px at 100% 0,#155e75 0%,transparent 50%),linear-gradient(160deg,#0b1120,#111827)}
+  .wrap{width:100%;max-width:900px}
+  .back{color:var(--muted);text-decoration:none;font-size:14px}.back:hover{color:var(--text)}
+  .hero{margin:26px 0 10px}
+  .pill{display:inline-flex;align-items:center;gap:8px;background:rgba(74,222,128,.12);
+    border:1px solid rgba(74,222,128,.4);color:var(--green);padding:6px 14px;border-radius:999px;font-size:13px;font-weight:600}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green)}
+  h1{font-size:40px;letter-spacing:-1px;margin:16px 0 8px}
+  .lead{color:var(--muted);font-size:17px;max-width:560px;line-height:1.6}
+  .connect{margin:28px 0;background:var(--card);border:1px solid var(--stroke);border-radius:18px;
+    padding:22px 24px;display:flex;flex-wrap:wrap;gap:18px;align-items:center;justify-content:space-between}
+  .connect .lbl{color:var(--muted);font-size:13px;margin-bottom:4px}
+  .connect .ip{font-family:monospace;font-size:20px;color:var(--acc)}
+  .stat{text-align:center}.stat .n{font-size:24px;font-weight:700}.stat .t{color:var(--muted);font-size:12px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-top:8px}
+  .card{background:var(--card);border:1px solid var(--stroke);border-radius:16px;padding:20px}
+  .card .e{font-size:26px}.card h3{margin:10px 0 6px;font-size:16px}.card p{color:var(--muted);font-size:13.5px;line-height:1.5}
+  footer{color:var(--muted);font-size:12px;margin-top:34px}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <a class="back" href="https://hub.pivasik.org">← на главную</a>
+    <div class="hero">
+      <span class="pill"><span class="dot"></span> Сервер онлайн</span>
+      <h1>pivasik craft</h1>
+      <p class="lead">Уютный модовый сервер для своих. Большая сборка, дружное сообщество и стабильный аптайм на домашнем кластере.</p>
+    </div>
+    <div class="connect">
+      <div><div class="lbl">Адрес для входа</div><div class="ip">game.pivasik.org</div></div>
+      <div class="stat"><div class="n">12/40</div><div class="t">игроков</div></div>
+      <div class="stat"><div class="n">All The Mods 10</div><div class="t">сборка</div></div>
+      <div class="stat"><div class="n">99.9%</div><div class="t">аптайм</div></div>
+    </div>
+    <div class="grid">
+      <div class="card"><div class="e">🧱</div><h3>Большая сборка</h3><p>Сотни модов: техника, магия, автоматизация и исследование измерений.</p></div>
+      <div class="card"><div class="e">🛡️</div><h3>Честная игра</h3><p>Приваты, бэкапы мира и адекватная модерация. Твои постройки в безопасности.</p></div>
+      <div class="card"><div class="e">⚡</div><h3>Без лагов</h3><p>Пре-ген чунков и мониторинг TPS — сервер держит нагрузку ровно.</p></div>
+    </div>
+    <footer>Работает на Kubernetes (k3s) · pivasik.org</footer>
+  </div>
+</body>
+</html>

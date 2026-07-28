@@ -1,0 +1,14 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: sites
+  namespace: sites
+  labels:
+    release: monitoring        # по этой метке Prometheus подхватывает монитор
+spec:
+  selector:
+    matchLabels:
+      monitored: "true"        # берёт все сервисы sites с этой меткой
+  endpoints:
+    - port: metrics
+      interval: 15s

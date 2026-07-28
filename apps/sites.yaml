@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: sites
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/Kofie4ik/k8s-stand.git
+    targetRevision: main
+    path: manifests/sites
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: sites
+
+  # automated пока НЕ включаем — сначала глазами
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true

@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sites-nginx-conf
+  namespace: sites
+data:
+  default.conf: |
+    server {
+      listen 80;
+      server_name _;
+      location / { root /usr/share/nginx/html; index index.html; }
+      location = /stub_status { stub_status; access_log off; allow 127.0.0.1; deny all; }
+    }

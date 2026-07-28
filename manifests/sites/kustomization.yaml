@@ -1,0 +1,29 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: sites
+
+resources:
+  - nginx-conf.yaml
+  - hub.yaml
+  - game.yaml
+  - cafe.yaml
+  - servicemonitor.yaml
+
+# ConfigMap'ы с содержимым сайтов собираются из обычных html-файлов.
+# Слева от "=" — ключ внутри ConfigMap, справа — путь к файлу в репозитории.
+configMapGenerator:
+  - name: hub-html
+    files:
+      - index.html=html/index.html
+  - name: game-html
+    files:
+      - index.html=html/game.html
+  - name: cafe-html
+    files:
+      - index.html=html/cafe.html
+
+# без этого kustomize допишет к именам хеш содержимого (hub-html-7c9f2d),
+# и вместо усыновления существующих ConfigMap'ов получилось бы пересоздание
+generatorOptions:
+  disableNameSuffixHash: true
