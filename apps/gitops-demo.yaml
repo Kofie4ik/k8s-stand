@@ -6,18 +6,18 @@ metadata:
 spec:
   project: default
 
-  # откуда брать желаемое состояние
   source:
     repoURL: https://github.com/Kofie4ik/k8s-stand.git
     targetRevision: main
     path: manifests/gitops-demo
 
-  # куда его применять
   destination:
     server: https://kubernetes.default.svc
     namespace: gitops-demo
 
   syncPolicy:
-    # automated намеренно НЕ включаем: сначала смотрим diff глазами
+    automated:
+      prune: true      # удалять из кластера то, что убрали из git
+      selfHeal: true   # возвращать как в git при ручных правках
     syncOptions:
       - CreateNamespace=true
