@@ -25,3 +25,6 @@ metrics:
     enabled: true
     additionalLabels:
       release: monitoring
+
+preUpgradeChecker:
+  jobEnabled: false
