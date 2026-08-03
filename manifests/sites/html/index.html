@@ -24,42 +24,89 @@
     box-shadow:0 8px 30px rgba(45,212,191,.35)}
   h1{font-size:30px;letter-spacing:-.5px;text-shadow:0 2px 20px rgba(0,0,0,.55)}
   .sub{color:var(--muted);margin:6px 0 36px;font-size:16px}
-  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px}
-  .card{background:var(--card);border:1px solid var(--stroke);border-radius:20px;padding:26px;
+  .sec{display:flex;align-items:center;gap:12px;margin:32px 0 14px}
+  .sec h3{font-size:12px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);font-weight:700}
+  .sec .line{flex:1;height:1px;background:var(--stroke)}
+  /* большие плитки — сайты */
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px}
+  .card{background:var(--card);border:1px solid var(--stroke);border-radius:18px;padding:20px;
     text-decoration:none;color:inherit;position:relative;overflow:hidden;
     backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
     transition:transform .25s,border-color .25s,box-shadow .25s}
-  .card:hover{transform:translateY(-6px);border-color:var(--accent);box-shadow:0 20px 50px rgba(0,0,0,.45)}
-  .card .emoji{font-size:34px;margin-bottom:14px;display:block}
-  .card h2{font-size:20px;margin-bottom:8px}
-  .card p{color:var(--muted);font-size:14px;line-height:1.5}
-  .card .go{margin-top:16px;color:var(--accent);font-weight:600;font-size:14px}
-  .services{display:flex;flex-wrap:wrap;gap:12px;margin-top:34px}
-  .chip{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:999px;
-    background:rgba(255,255,255,.05);border:1px solid var(--stroke);color:var(--text);
-    text-decoration:none;font-size:13px;backdrop-filter:blur(8px);transition:background .2s}
-  .chip:hover{background:rgba(255,255,255,.12)}
+  .card:hover{transform:translateY(-5px);border-color:var(--accent);box-shadow:0 18px 44px rgba(0,0,0,.45)}
+  .card .emoji{font-size:27px;margin-bottom:10px;display:block}
+  .card h2{font-size:17px;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+  .card p{color:var(--muted);font-size:13px;line-height:1.5}
+  .card .go{margin-top:12px;color:var(--accent);font-weight:600;font-size:13px}
+  /* маленькие плитки — сервисы стенда */
+  .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(198px,1fr));gap:12px}
+  .tile{display:flex;align-items:flex-start;gap:11px;padding:13px 14px;border-radius:14px;
+    background:var(--card);border:1px solid var(--stroke);color:inherit;text-decoration:none;
+    backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    transition:transform .2s,border-color .2s,background .2s}
+  .tile:hover{transform:translateY(-3px);border-color:var(--accent);background:rgba(255,255,255,.1)}
+  .tile .ic{font-size:19px;line-height:1.15;flex:none}
+  .tile .bd{min-width:0}
+  .tile .tt{display:flex;align-items:center;gap:7px;font-size:14px;font-weight:600}
+  .tile .td{display:block;color:var(--muted);font-size:12px;line-height:1.4;margin-top:3px}
+  /* индикаторы состояния */
+  .st{display:inline-block;width:8px;height:8px;border-radius:50%;flex:none;background:#64748b;
+    transition:background .3s,box-shadow .3s}
+  .st.wait{background:#eab308;animation:blink 1.2s ease-in-out infinite}
+  .st.up{background:#22c55e;box-shadow:0 0 9px rgba(34,197,94,.9)}
+  .st.down{background:#ef4444;box-shadow:0 0 9px rgba(239,68,68,.9)}
+  @keyframes blink{0%,100%{opacity:.3}50%{opacity:1}}
   footer{color:var(--muted);font-size:12.5px;margin-top:40px;text-align:center;line-height:1.6}
   .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px var(--accent)}
+  .dot.wait{background:#eab308;box-shadow:0 0 10px #eab308;animation:blink 1.2s ease-in-out infinite}
+  .dot.down{background:#ef4444;box-shadow:0 0 10px #ef4444}
 </style>
 </head>
 <body>
   <canvas id="rain"></canvas>
   <div class="wrap">
     <header><div class="logo">p</div><div><h1>pivasik</h1></div></header>
-    <p class="sub">Домашний стенд на k3s · <span class="dot"></span> все сервисы онлайн</p>
+    <p class="sub">Домашний стенд на k3s · две ноды · <span class="dot wait" id="hdot"></span> <span id="hstat">проверяю сервисы…</span></p>
+
+    <div class="sec"><h3>Сайты</h3><div class="line"></div></div>
     <div class="grid">
-      <a class="card" href="https://game.pivasik.org"><span class="emoji">🎮</span><h2>Игровой сервер</h2>
+      <a class="card" href="https://game.pivasik.org" data-ping><span class="emoji">🎮</span>
+        <h2>Игровой сервер<i class="st wait"></i></h2>
         <p>Сообщество и статус игрового сервера — сборки, вход, правила.</p><div class="go">Открыть →</div></a>
-      <a class="card" href="https://cafe.pivasik.org"><span class="emoji">☕</span><h2>Кофейня «Обжарка»</h2>
+      <a class="card" href="https://cafe.pivasik.org" data-ping><span class="emoji">☕</span>
+        <h2>Кофейня «Обжарка»<i class="st wait"></i></h2>
         <p>Уютное место с авторским обжаром. Меню, часы работы, контакты.</p><div class="go">Открыть →</div></a>
     </div>
-    <div class="services">
-      <a class="chip" href="https://hl.pivasik.org">🧭 Headlamp — панель кластера</a>
-      <a class="chip" href="https://db.pivasik.org">🗄️ Adminer — база данных</a>
-      <a class="chip" href="https://grafana.pivasik.org">📊 Grafana — метрики</a>
+
+    <div class="sec"><h3>Инфраструктура стенда</h3><div class="line"></div></div>
+    <div class="tiles">
+      <a class="tile" href="https://argo.pivasik.org" data-ping><span class="ic">🚀</span><span class="bd">
+        <span class="tt">Argo CD<i class="st wait"></i></span>
+        <span class="td">GitOps — весь стенд из git</span></span></a>
+      <a class="tile" href="https://longhorn.pivasik.org" data-ping><span class="ic">💾</span><span class="bd">
+        <span class="tt">Longhorn<i class="st wait"></i></span>
+        <span class="td">Хранилище, реплики на двух нодах</span></span></a>
+      <a class="tile" href="https://grafana.pivasik.org" data-ping><span class="ic">📊</span><span class="bd">
+        <span class="tt">Grafana<i class="st wait"></i></span>
+        <span class="td">Метрики и логи — Prometheus, Loki</span></span></a>
+      <a class="tile" href="https://hl.pivasik.org" data-ping><span class="ic">🧭</span><span class="bd">
+        <span class="tt">Headlamp<i class="st wait"></i></span>
+        <span class="td">Панель кластера</span></span></a>
+      <a class="tile" href="https://db.pivasik.org" data-ping><span class="ic">🗄️</span><span class="bd">
+        <span class="tt">Adminer<i class="st wait"></i></span>
+        <span class="td">PostgreSQL — база стенда</span></span></a>
+      <a class="tile" href="https://gitops.pivasik.org" data-ping><span class="ic">🧪</span><span class="bd">
+        <span class="tt">gitops-demo<i class="st wait"></i></span>
+        <span class="td">Песочница GitOps</span></span></a>
+      <a class="tile" href="https://tent.pivasik.org" data-ping><span class="ic">🖥️</span><span class="bd">
+        <span class="tt">Cockpit · нода<i class="st wait"></i></span>
+        <span class="td">docker-tent, 10.0.2.30</span></span></a>
+      <a class="tile" href="https://cockpit.pivasik.org" data-ping><span class="ic">🛡️</span><span class="bd">
+        <span class="tt">Cockpit · шлюз<i class="st wait"></i></span>
+        <span class="td">main-server — BIND, nginx, nftables</span></span></a>
     </div>
-    <footer>Хостинг на Kubernetes (k3s) · traefik + nginx + BIND<br>Один кластер — много сайтов, маршрутизация по имени хоста</footer>
+
+    <footer>Хостинг на Kubernetes (k3s) · traefik + nginx + BIND · Longhorn на двух нодах<br>Один кластер — много сайтов, маршрутизация по имени хоста</footer>
   </div>
 <script>
 (function(){
@@ -250,6 +297,58 @@
     requestAnimationFrame(frame);
   }
   frame();
+})();
+</script>
+<script>
+/* Индикаторы доступности сервисов.
+   Проверка идёт из браузера, mode:"no-cors" — ответ непрозрачный, читать его нельзя.
+   Зелёный = ответ по сети пришёл (в том числе 401 у Longhorn и 502 от traefik),
+   красный = DNS/TCP/TLS не дали ответа за отведённое время. Это индикатор
+   «имя резолвится и порт отвечает», а не «приложение здорово». */
+(function(){
+  const TIMEOUT = 7000, PERIOD = 60000;
+  const nodes = [...document.querySelectorAll("[data-ping]")]
+    .map(el => ({ el, url: el.getAttribute("href"), st: el.querySelector(".st") }))
+    .filter(n => n.st);
+  const hdot = document.getElementById("hdot"), hstat = document.getElementById("hstat");
+
+  function hit(url, method){
+    const ac = new AbortController();
+    const t = setTimeout(() => ac.abort(), TIMEOUT);
+    return fetch(url + (url.includes("?") ? "&" : "?") + "_ping=" + Date.now(),
+      { method, mode: "no-cors", cache: "no-store", credentials: "omit",
+        redirect: "follow", signal: ac.signal })
+      .then(() => true, () => false)
+      .finally(() => clearTimeout(t));
+  }
+
+  // HEAD дешевле, но часть бэкендов его не любит — тогда добиваем GET'ом
+  const probe = url => hit(url, "HEAD").then(ok => ok || hit(url, "GET"));
+
+  function set(node, ok){
+    node.st.classList.remove("wait");
+    node.st.classList.toggle("up", ok);
+    node.st.classList.toggle("down", !ok);
+    node.el.title = (ok ? "отвечает" : "не отвечает") + " · проверено " +
+      new Date().toLocaleTimeString("ru-RU");
+  }
+
+  function round(){
+    if (hdot) hdot.className = "dot wait";
+    if (hstat) hstat.textContent = "проверяю сервисы…";
+    Promise.all(nodes.map(n => probe(n.url).then(ok => { set(n, ok); return ok; })))
+      .then(res => {
+        const up = res.filter(Boolean).length, all = res.length;
+        if (hstat) hstat.textContent = up === all
+          ? "все сервисы отвечают (" + all + ")"
+          : up + " из " + all + " сервисов отвечают";
+        if (hdot) hdot.className = up === all ? "dot" : (up === 0 ? "dot down" : "dot wait");
+      });
+  }
+
+  round();
+  setInterval(round, PERIOD);
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) round(); });
 })();
 </script>
 </body>
