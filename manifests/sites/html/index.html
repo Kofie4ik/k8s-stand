@@ -175,10 +175,12 @@
       <a class="tile" href="https://gitops.pivasik.org" data-ping><span class="ic">🧪</span><span class="bd">
         <span class="tt">gitops-demo<i class="st wait"></i></span>
         <span class="td">Песочница GitOps</span></span></a>
-      <a class="tile" href="https://tent.pivasik.org" data-ping><span class="ic">🖥️</span><span class="bd">
+      <a class="tile" href="https://tent.pivasik.org" data-ping
+         data-probe="https://tent.pivasik.org/ping"><span class="ic">🖥️</span><span class="bd">
         <span class="tt">Cockpit · нода<i class="st wait"></i></span>
         <span class="td">docker-tent, 10.0.2.30</span></span></a>
-      <a class="tile" href="https://main.pivasik.org" data-ping><span class="ic">🛡️</span><span class="bd">
+      <a class="tile" href="https://main.pivasik.org" data-ping
+         data-probe="https://main.pivasik.org/ping"><span class="ic">🛡️</span><span class="bd">
         <span class="tt">Cockpit · шлюз<i class="st wait"></i></span>
         <span class="td">main-server — BIND, nginx, nftables</span></span></a>
     </div>
@@ -381,11 +383,14 @@
    Проверка идёт из браузера, mode:"no-cors" — ответ непрозрачный, читать его нельзя.
    Зелёный = ответ по сети пришёл (в том числе 401 у Longhorn и 502 от traefik),
    красный = DNS/TCP/TLS не дали ответа за отведённое время. Это индикатор
-   «имя резолвится и порт отвечает», а не «приложение здорово». */
+   «имя резолвится и порт отвечает», а не «приложение здорово».
+   data-probe у плитки задаёт отдельный адрес для проверки: Cockpit отдаёт
+   Cross-Origin-Resource-Policy: same-origin и режет кросс-доменную проверку
+   корня (ERR_BLOCKED_BY_RESPONSE.NotSameOrigin), а /ping отвечает без неё. */
 (function(){
   const TIMEOUT = 7000, PERIOD = 60000;
   const nodes = [...document.querySelectorAll("[data-ping]")]
-    .map(el => ({ el, url: el.getAttribute("href"), st: el.querySelector(".st") }))
+    .map(el => ({ el, url: el.dataset.probe || el.getAttribute("href"), st: el.querySelector(".st") }))
     .filter(n => n.st);
   const hdot = document.getElementById("hdot"),
         hstat = document.getElementById("hstat"),
