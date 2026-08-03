@@ -16,12 +16,23 @@
       radial-gradient(900px 520px at 100% 0%,#0b2b3a 0%,transparent 50%),
       linear-gradient(160deg,#0a0f1c,#0d1424 55%,#0a1220)}
   #rain{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
-  .wrap{position:relative;z-index:1;width:100%;max-width:960px;margin:0 auto;padding:48px 20px}
-  header{display:flex;align-items:center;gap:14px;margin-bottom:8px}
-  .logo{width:46px;height:46px;border-radius:14px;flex:none;
-    background:linear-gradient(135deg,var(--accent),var(--accent2));
-    display:grid;place-items:center;font-weight:800;color:#0f172a;font-size:22px;
-    box-shadow:0 8px 30px rgba(45,212,191,.35)}
+  .wrap{position:relative;z-index:1;width:100%;max-width:960px;margin:0 auto;padding:48px 20px 20px;
+    min-height:100vh;display:flex;flex-direction:column}
+  header{position:relative;display:flex;align-items:center;gap:14px;margin-bottom:8px}
+  .logo{width:46px;height:46px;border-radius:14px;flex:none;cursor:default;
+    display:flex;align-items:center;justify-content:center;line-height:1;font-size:24px;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));background-size:100% 100%;
+    box-shadow:0 8px 30px rgba(45,212,191,.35);
+    transition:box-shadow .3s,transform .3s}
+  .logo span{display:block;transform:translateY(-1px)}
+  /* Бесшовный перелив: первый и последний стоп одного цвета, ширина тайла ровно
+     один цикл (184px), сдвиг за период — тоже 184px. Стык тайлов невидим, петля замкнута. */
+  .logo:hover{transform:translateY(-2px) scale(1.04);
+    box-shadow:0 10px 34px rgba(167,139,250,.45);
+    background-image:linear-gradient(90deg,#2dd4bf,#a78bfa,#f59e0b,#facc15,#2dd4bf);
+    background-size:184px 100%;background-repeat:repeat;
+    animation:sheen 3.2s linear infinite}
+  @keyframes sheen{from{background-position:0 0}to{background-position:184px 0}}
   h1{font-size:30px;letter-spacing:-.5px;text-shadow:0 2px 20px rgba(0,0,0,.55)}
   .sub{color:var(--muted);margin:6px 0 36px;font-size:16px}
   .sec{display:flex;align-items:center;gap:12px;margin:32px 0 14px}
@@ -38,8 +49,7 @@
   .card h2{font-size:17px;margin-bottom:6px;display:flex;align-items:center;gap:8px}
   .card p{color:var(--muted);font-size:13px;line-height:1.5}
   .card .go{margin-top:12px;color:var(--accent);font-weight:600;font-size:13px}
-  /* маленькие плитки — сервисы стенда */
-  .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(198px,1fr));gap:12px}
+  /* маленькие плитки — сервисы стенда (живут в шторке) */
   .tile{display:flex;align-items:flex-start;gap:11px;padding:13px 14px;border-radius:14px;
     background:var(--card);border:1px solid var(--stroke);color:inherit;text-decoration:none;
     backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
@@ -56,17 +66,76 @@
   .st.up{background:#22c55e;box-shadow:0 0 9px rgba(34,197,94,.9)}
   .st.down{background:#ef4444;box-shadow:0 0 9px rgba(239,68,68,.9)}
   @keyframes blink{0%,100%{opacity:.3}50%{opacity:1}}
-  footer{color:var(--muted);font-size:12.5px;margin-top:40px;text-align:center;line-height:1.6}
+  footer{color:var(--muted);font-size:12.5px;margin-top:auto;padding-top:40px;
+    text-align:center;line-height:1.7}
   .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px var(--accent)}
   .dot.wait{background:#eab308;box-shadow:0 0 10px #eab308;animation:blink 1.2s ease-in-out infinite}
   .dot.down{background:#ef4444;box-shadow:0 0 10px #ef4444}
+
+  /* ── кнопка вызова меню ───────────────────────────────────────── */
+  /* «Сервисы» вынесена к левому краю экрана: 50% — половина колонки, 50vw — половина окна,
+     их разность и есть расстояние от колонки до края. Логотип и заголовок не двигаются. */
+  .mbtn{position:absolute;left:calc(50% - 50vw + 28px);top:0;bottom:0;margin:auto 0;height:38px;
+    display:inline-flex;align-items:center;gap:9px;cursor:pointer;
+    padding:0 15px;border-radius:999px;font:inherit;font-size:13.5px;color:var(--text);
+    background:rgba(255,255,255,.05);border:1px solid var(--stroke);
+    backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+    transition:background .2s,border-color .2s,transform .2s}
+  .mbtn:hover{background:rgba(255,255,255,.12);border-color:var(--accent);transform:translateY(-1px)}
+  .mbtn .cnt{color:var(--muted);font-size:12px;font-variant-numeric:tabular-nums}
+  .mbtn .bars{display:inline-flex;flex-direction:column;gap:3px;width:14px}
+  .mbtn .bars i{height:1.5px;background:currentColor;border-radius:2px;opacity:.75}
+  .mbtn .bars i:nth-child(2){width:70%}
+
+  /* ── затемнение с блюром ──────────────────────────────────────── */
+  .scrim{position:fixed;inset:0;z-index:40;background:rgba(6,10,20,.5);
+    backdrop-filter:blur(7px) saturate(.85);-webkit-backdrop-filter:blur(7px) saturate(.85);
+    opacity:0;visibility:hidden;transition:opacity .32s ease,visibility .32s}
+  body.menu-open .scrim{opacity:1;visibility:visible}
+  body.menu-open{overflow:hidden}
+
+  /* ── выезжающая шторка ────────────────────────────────────────── */
+  .drawer{position:fixed;top:0;bottom:0;z-index:50;width:min(370px,88vw);
+    display:flex;flex-direction:column;overflow:hidden;
+    background:linear-gradient(180deg,rgba(16,23,38,.93),rgba(10,15,28,.95));
+    backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+    box-shadow:0 0 60px rgba(0,0,0,.6);visibility:hidden;
+    transition:transform .34s cubic-bezier(.22,.9,.3,1),visibility .34s}
+  .drawer.side-right{right:0;border-left:1px solid var(--stroke);transform:translateX(103%)}
+  .drawer.side-left {left:0; border-right:1px solid var(--stroke);transform:translateX(-103%)}
+  body.menu-open .drawer{transform:translateX(0);visibility:visible}
+  .dhead{display:flex;align-items:center;gap:12px;padding:20px 20px 14px;border-bottom:1px solid var(--stroke)}
+  .dhead h3{font-size:12px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);font-weight:700}
+  .dclose{margin-left:auto;cursor:pointer;width:32px;height:30px;border-radius:9px;flex:none;
+    display:grid;place-items:center;font-size:17px;line-height:1;color:var(--muted);
+    background:rgba(255,255,255,.05);border:1px solid var(--stroke);
+    transition:background .2s,color .2s,transform .2s}
+  .dclose:hover{background:rgba(255,255,255,.13);color:var(--text);transform:translateX(-3px)}
+  .dlist{flex:1;overflow-y:auto;padding:16px 20px;display:grid;gap:10px;align-content:start}
+  .dfoot{padding:13px 20px;border-top:1px solid var(--stroke);color:var(--muted);font-size:11.5px;
+    display:flex;align-items:center;gap:8px}
+  .dfoot .refresh{margin-left:auto;cursor:pointer;color:var(--accent);background:none;border:0;
+    font:inherit;font-size:11.5px;padding:2px 4px}
+  .dfoot .refresh:hover{text-decoration:underline}
+  /* узкие экраны: у края места нет — кнопка возвращается в строку шапки */
+  @media (max-width:1400px){ .mbtn{position:static;margin-left:4px} }
+  @media (max-width:640px){ footer{padding-bottom:52px} }  /* не залезаем под тумблер «Взаимодействие» */
+  @media (max-width:520px){ .mbtn .lbl{display:none} }
 </style>
 </head>
 <body>
   <canvas id="rain"></canvas>
   <div class="wrap">
-    <header><div class="logo">p</div><div><h1>pivasik</h1></div></header>
-    <p class="sub">Домашний стенд на k3s · две ноды · <span class="dot wait" id="hdot"></span> <span id="hstat">проверяю сервисы…</span></p>
+    <div class="topbar">
+      <header><div class="logo" title="pivasik"><span>🍺</span></div><div><h1>pivasik</h1></div>
+        <button class="mbtn" id="mbtn" type="button" aria-expanded="false" aria-controls="drawer">
+          <span class="bars"><i></i><i></i><i></i></span>
+          <span class="lbl">Сервисы</span>
+          <span class="dot wait" id="hdot"></span><span class="cnt" id="hcnt">…</span>
+        </button>
+      </header>
+      <p class="sub">Домашний стенд на k3s · две ноды · traefik + nginx + BIND</p>
+    </div>
 
     <div class="sec"><h3>Сайты</h3><div class="line"></div></div>
     <div class="grid">
@@ -78,8 +147,16 @@
         <p>Уютное место с авторским обжаром. Меню, часы работы, контакты.</p><div class="go">Открыть →</div></a>
     </div>
 
-    <div class="sec"><h3>Инфраструктура стенда</h3><div class="line"></div></div>
-    <div class="tiles">
+    <footer>Хостинг на Kubernetes (k3s)<br>Один кластер — много сайтов, маршрутизация по имени хоста</footer>
+  </div>
+
+  <div class="scrim" id="scrim"></div>
+  <aside class="drawer side-left" id="drawer" aria-hidden="true" aria-label="Инфраструктура стенда">
+    <div class="dhead">
+      <h3>Инфраструктура стенда</h3>
+      <button class="dclose" id="dclose" type="button" aria-label="Закрыть меню" title="Закрыть">&lsaquo;</button>
+    </div>
+    <div class="dlist">
       <a class="tile" href="https://argo.pivasik.org" data-ping><span class="ic">🚀</span><span class="bd">
         <span class="tt">Argo CD<i class="st wait"></i></span>
         <span class="td">GitOps — весь стенд из git</span></span></a>
@@ -100,14 +177,14 @@
         <span class="td">Песочница GitOps</span></span></a>
       <a class="tile" href="https://tent.pivasik.org" data-ping><span class="ic">🖥️</span><span class="bd">
         <span class="tt">Cockpit · нода<i class="st wait"></i></span>
-        <span class="td">docker-tent, 10.0.2.30</span></span></a>
+        <span class="td">docker-tent</span></span></a>
       <a class="tile" href="https://cockpit.pivasik.org" data-ping><span class="ic">🛡️</span><span class="bd">
         <span class="tt">Cockpit · шлюз<i class="st wait"></i></span>
         <span class="td">main-server — BIND, nginx, nftables</span></span></a>
     </div>
-
-    <footer>Хостинг на Kubernetes (k3s) · traefik + nginx + BIND · Longhorn на двух нодах<br>Один кластер — много сайтов, маршрутизация по имени хоста</footer>
-  </div>
+    <div class="dfoot"><span id="hstat">проверяю сервисы…</span>
+      <button class="refresh" id="dref" type="button">обновить</button></div>
+  </aside>
 <script>
 (function(){
   const cv=document.getElementById('rain'),ctx=cv.getContext('2d');
@@ -310,7 +387,9 @@
   const nodes = [...document.querySelectorAll("[data-ping]")]
     .map(el => ({ el, url: el.getAttribute("href"), st: el.querySelector(".st") }))
     .filter(n => n.st);
-  const hdot = document.getElementById("hdot"), hstat = document.getElementById("hstat");
+  const hdot = document.getElementById("hdot"),
+        hstat = document.getElementById("hstat"),
+        hcnt = document.getElementById("hcnt");
 
   function hit(url, method){
     const ac = new AbortController();
@@ -333,22 +412,66 @@
       new Date().toLocaleTimeString("ru-RU");
   }
 
+  let busy = false;
   function round(){
+    if (busy) return;
+    busy = true;
     if (hdot) hdot.className = "dot wait";
+    if (hcnt) hcnt.textContent = "…";
     if (hstat) hstat.textContent = "проверяю сервисы…";
+    nodes.forEach(n => { n.st.className = "st wait"; });
     Promise.all(nodes.map(n => probe(n.url).then(ok => { set(n, ok); return ok; })))
       .then(res => {
         const up = res.filter(Boolean).length, all = res.length;
-        if (hstat) hstat.textContent = up === all
-          ? "все сервисы отвечают (" + all + ")"
-          : up + " из " + all + " сервисов отвечают";
+        if (hcnt) hcnt.textContent = up + "/" + all;
         if (hdot) hdot.className = up === all ? "dot" : (up === 0 ? "dot down" : "dot wait");
-      });
+        if (hstat) hstat.textContent = (up === all
+          ? "все сервисы отвечают (" + all + ")"
+          : up + " из " + all + " отвечают") +
+          " · " + new Date().toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" });
+      })
+      .finally(() => { busy = false; });
   }
 
+  window.pingNow = round;
   round();
   setInterval(round, PERIOD);
   document.addEventListener("visibilitychange", () => { if (!document.hidden) round(); });
+})();
+</script>
+<script>
+/* Выезжающее меню: кнопка в шапке, затемнение с блюром, Esc и клик мимо закрывают. */
+(function(){
+  const body = document.body,
+        btn = document.getElementById("mbtn"),
+        drawer = document.getElementById("drawer"),
+        scrim = document.getElementById("scrim"),
+        close = document.getElementById("dclose"),
+        ref = document.getElementById("dref");
+  let lastFocus = null;
+
+  function open(){
+    lastFocus = document.activeElement;
+    body.classList.add("menu-open");
+    btn.setAttribute("aria-expanded", "true");
+    drawer.setAttribute("aria-hidden", "false");
+    const first = drawer.querySelector("a,button");
+    if (first) setTimeout(() => first.focus({ preventScroll: true }), 340);
+    if (window.pingNow) window.pingNow();   // открыли меню — сразу перепроверяем
+  }
+  function shut(){
+    body.classList.remove("menu-open");
+    btn.setAttribute("aria-expanded", "false");
+    drawer.setAttribute("aria-hidden", "true");
+    if (lastFocus) lastFocus.focus({ preventScroll: true });
+  }
+  const isOpen = () => body.classList.contains("menu-open");
+
+  btn.addEventListener("click", () => isOpen() ? shut() : open());
+  close.addEventListener("click", shut);
+  scrim.addEventListener("click", shut);
+  if (ref) ref.addEventListener("click", () => window.pingNow && window.pingNow());
+  document.addEventListener("keydown", e => { if (e.key === "Escape" && isOpen()) shut(); });
 })();
 </script>
 </body>
