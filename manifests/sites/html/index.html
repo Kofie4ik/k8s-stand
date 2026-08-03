@@ -479,5 +479,28 @@
   document.addEventListener("keydown", e => { if (e.key === "Escape" && isOpen()) shut(); });
 })();
 </script>
+<script>
+/* Чип «эх Михаил» рядом с тумблером «Взаимодействие».
+   Тумблер рисует скрипт сцены и позиционирует его фиксированно, поэтому ширину
+   меряем в рантайме и отступаем от неё — иначе чипы налезут друг на друга. */
+(function(){
+  const a=document.createElement("a");
+  a.href="/mihail.html";a.textContent="эх Михаил 😔";
+  a.style.cssText="position:fixed;bottom:16px;right:16px;z-index:6;padding:8px 14px;border-radius:999px;"+
+    "background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);backdrop-filter:blur(8px);"+
+    "-webkit-backdrop-filter:blur(8px);color:#e2e8f0;font:13px -apple-system,BlinkMacSystemFont,sans-serif;"+
+    "text-decoration:none;white-space:nowrap;transition:background .2s,border-color .2s";
+  a.addEventListener("mouseenter",()=>{a.style.background="rgba(255,255,255,.13)";a.style.borderColor="#f472b6";});
+  a.addEventListener("mouseleave",()=>{a.style.background="rgba(255,255,255,.06)";a.style.borderColor="rgba(255,255,255,.14)";});
+  document.body.appendChild(a);
+  function place(){
+    const t=[...document.body.children].find(el=>el!==a&&el.tagName==="DIV"&&
+      getComputedStyle(el).position==="fixed"&&/Взаимодействие/.test(el.textContent||""));
+    a.style.right=(t?Math.round(t.getBoundingClientRect().width)+26:16)+"px";
+  }
+  requestAnimationFrame(place);setTimeout(place,300);
+  addEventListener("resize",()=>setTimeout(place,60));
+})();
+</script>
 </body>
 </html>
