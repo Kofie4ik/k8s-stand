@@ -16,6 +16,7 @@ configMapGenerator:
   - name: hub-html
     files:
       - index.html=html/index.html
+      - mihail.html=html/mihail.html
   - name: game-html
     files:
       - index.html=html/game.html
