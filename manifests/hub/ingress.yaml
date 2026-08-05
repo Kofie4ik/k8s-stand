@@ -6,14 +6,27 @@ metadata:
 spec:
   ingressClassName: traefik
   rules:
-    # ⚠ Пока имя тестовое. Когда убедишься, что всё работает, поменяешь
-    #   на pivasik.org — правка одной строки, wildcard в BIND уже покрывает
-    #   любое имя зоны, отдельная запись не нужна.
+    # основное имя — корень зоны
+    - host: pivasik.org
+      http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: hub-api
+                port: { number: 8000 }
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: hub-web
+                port: { number: 80 }
+
+    # временный запасной вход, убрать после проверки
     - host: hub2.pivasik.org
       http:
         paths:
-          # Порядок в списке роли не играет: traefik сопоставляет по длине
-          # пути, и более точный /api выигрывает у корневого /.
           - path: /api
             pathType: Prefix
             backend:
