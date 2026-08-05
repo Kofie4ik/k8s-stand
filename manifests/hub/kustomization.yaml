@@ -8,6 +8,7 @@ resources:
   - api-service.yaml
   - web-deployment.yaml
   - web-service.yaml
+  - middlewares.yaml
   - ingress.yaml
   # добавится после kubeseal — см. README-hub.md
   - sealedsecret.yaml

@@ -3,27 +3,53 @@ kind: Ingress
 metadata:
   name: hub
   namespace: hub
+  annotations:
+    # Формат имени: <namespace>-<имя middleware>@kubernetescrd
+    traefik.ingress.kubernetes.io/router.middlewares: hub-web-headers@kubernetescrd
 spec:
   ingressClassName: traefik
   rules:
-    # основное имя — корень зоны
     - host: pivasik.org
       http:
         paths:
-          - path: /api
-            pathType: Prefix
-            backend:
-              service:
-                name: hub-api
-                port: { number: 8000 }
           - path: /
             pathType: Prefix
             backend:
               service:
                 name: hub-web
                 port: { number: 80 }
-
-    # временный запасной вход, убрать после проверки
+    # Временный запасной вход — убрать, когда решим, что пора.
+    - host: hub2.pivasik.org
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: hub-web
+                port: { number: 80 }
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: hub-api
+  namespace: hub
+  annotations:
+    traefik.ingress.kubernetes.io/router.middlewares: hub-api-headers@kubernetescrd
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: pivasik.org
+      http:
+        paths:
+          # Правило длиннее корневого, поэтому traefik отдаёт /api сюда,
+          # даже что объекты Ingress теперь разные.
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: hub-api
+                port: { number: 8000 }
     - host: hub2.pivasik.org
       http:
         paths:
@@ -33,9 +59,3 @@ spec:
               service:
                 name: hub-api
                 port: { number: 8000 }
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: hub-web
-                port: { number: 80 }
