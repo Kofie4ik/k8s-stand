@@ -28,6 +28,8 @@ spec:
               value: "true"
             # доверяем заголовкам от traefik, иначе реестр в ответах на запросы
             # выдаёт свой внутренний адрес вместо registry.pivasik.org
+            - name: REGISTRY_HTTP_RELATIVEURLS
+              value: "true"
             - name: REGISTRY_HTTP_HEADERS_X-Content-Type-Options
               value: "[nosniff]"
           volumeMounts:
