@@ -1,0 +1,17 @@
+# Пароль стоит на traefik, а не внутри реестра — тем же приёмом, что уже
+# работает у Longhorn (см. заметку 25).
+#
+# ⚠ Проверь версию API перед применением:
+#     kubectl api-resources | grep -i middleware
+# traefik v2 → traefik.containo.us/v1alpha1, traefik v3 → traefik.io/v1alpha1.
+# Если написать не ту группу, объект просто не создастся, Argo покажет ошибку.
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: registry-auth
+  namespace: registry
+spec:
+  basicAuth:
+    # Secret с ключом `users` — строки формата htpasswd.
+    # Создаётся отдельно и едет в git запечатанным (заметка 23).
+    secret: registry-auth

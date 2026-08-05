@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: registry-data
+  namespace: registry
+spec:
+  accessModes: [ReadWriteOnce]
+  storageClassName: longhorn
+  resources:
+    requests:
+      # 20 ГБ на диске превращаются в 40: Longhorn держит по реплике на каждой
+      # ноде. Образ хаба весит ~150 МБ, но слои копятся с каждой версией —
+      # старые теги придётся иногда чистить вручную.
+      storage: 20Gi

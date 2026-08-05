@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: registry
+  namespace: registry
+spec:
+  replicas: 1
+  # Том ReadWriteOnce аттачится к одной ноде, поэтому две реплики одновременно
+  # его не получат. Recreate: сначала гасим старый под, потом поднимаем новый.
+  # При RollingUpdate новый встал бы в Pending, ожидая том, который держит старый.
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels: { app: registry }
+  template:
+    metadata:
+      labels: { app: registry }
+    spec:
+      containers:
+        - name: registry
+          image: registry:2.8.3
+          ports:
+            - containerPort: 5000
+              name: http
+          env:
+            # без этого удалить образ из реестра нельзя вообще никак
+            - name: REGISTRY_STORAGE_DELETE_ENABLED
+              value: "true"
+            # доверяем заголовкам от traefik, иначе реестр в ответах на запросы
+            # выдаёт свой внутренний адрес вместо registry.pivasik.org
+            - name: REGISTRY_HTTP_HEADERS_X-Content-Type-Options
+              value: "[nosniff]"
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/registry
+          resources:
+            requests: { memory: "64Mi",  cpu: "20m" }
+            limits:   { memory: "512Mi", cpu: "500m" }
+          # /v2/ — служебная ручка реестра, отвечает всегда. Пароль стоит на
+          # traefik, а не внутри реестра, поэтому проба видит чистый 200.
+          livenessProbe:
+            httpGet: { path: /v2/, port: 5000 }
+            initialDelaySeconds: 10
+            periodSeconds: 20
+          readinessProbe:
+            httpGet: { path: /v2/, port: 5000 }
+            initialDelaySeconds: 3
+            periodSeconds: 10
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: registry-data

@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: registry
+  namespace: registry
+  annotations:
+    # Формат ссылки: <namespace>-<имя middleware>@kubernetescrd.
+    # ⚠ Опечатка здесь НЕ ломает маршрут — traefik просто пустит без пароля.
+    # Ровно та грабля, что описана в 25-й части. После применения обязательно
+    # проверить curl'ом без пароля: должен прийти 401.
+    traefik.ingress.kubernetes.io/router.middlewares: registry-registry-auth@kubernetescrd
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: registry.pivasik.org
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: registry
+                port:
+                  number: 5000

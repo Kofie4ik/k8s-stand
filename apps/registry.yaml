@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: registry
+  namespace: argocd
+  finalizers:
+    # без него удаление Application оставит ресурсы в кластере сиротами
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/Kofie4ik/k8s-stand.git
+    targetRevision: HEAD
+    path: manifests/registry
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: registry
+  syncPolicy:
+    automated:
+      selfHeal: true
+      # prune намеренно ВЫКЛЮЧЕН: включённый однажды снёс PVC вместе с данными
+      # (заметка 22). Удалять ресурсы будем руками, осознанно.
+      prune: false
+    syncOptions:
+      - CreateNamespace=true
