@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hub-web
+  namespace: hub
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: hub-web }
+  template:
+    metadata:
+      labels: { app: hub-web }
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:alpine
+          ports:
+            - containerPort: 80
+              name: http
+          volumeMounts:
+            - name: html
+              mountPath: /usr/share/nginx/html
+          resources:
+            requests: { memory: "16Mi", cpu: "10m" }
+            limits:   { memory: "64Mi", cpu: "100m" }
+      volumes:
+        - name: html
+          configMap:
+            # имя без хвоста: kustomize сам подставит сюда сгенерированное
+            # имя с хешем содержимого — правка index.html меняет хеш, меняет
+            # имя ConfigMap и тем самым перезапускает под. Ровно то, чего
+            # не хватало в 18-й части, где ConfigMap приходилось пересоздавать.
+            name: hub-html

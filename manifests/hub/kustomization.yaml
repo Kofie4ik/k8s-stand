@@ -1,0 +1,26 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: hub
+
+resources:
+  - namespace.yaml
+  - api-deployment.yaml
+  - api-service.yaml
+  - web-deployment.yaml
+  - web-service.yaml
+  - ingress.yaml
+  # добавится после kubeseal — см. README-hub.md
+  - sealedsecret.yaml
+
+configMapGenerator:
+  # Страница едет в кластер как ConfigMap, собранный из файла на лету.
+  - name: hub-html
+    files:
+      - index.html=html/index.html
+
+  # Адрес Prometheus внутри кластера. Имя взято с самого стенда:
+  #   kubectl -n monitoring get svc | grep -i prometheus
+  # Формат: http://<имя-сервиса>.<namespace>:<порт>
+  - name: hub-config
+    literals:
+      - PROM_URL=http://monitoring-kube-prometheus-prometheus.monitoring:9090
