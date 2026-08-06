@@ -521,8 +521,8 @@ kbd{background:var(--surf);border:1px solid var(--line);color:var(--dim)}
           <div id="auth-guest">
             <span class="lbl">Вход</span>
             <form id="login" autocomplete="off">
-              <input type="text" id="user" placeholder="Логин" autocomplete="username">
-              <input type="password" id="pass" placeholder="Пароль" autocomplete="current-password">
+              <input type="text" id="user" placeholder="Логин" autocomplete="username" maxlength="64">
+              <input type="password" id="pass" placeholder="Пароль" autocomplete="current-password" maxlength="200">
               <button class="btn" type="submit">Войти</button>
             </form>
             <div class="msg" id="lmsg"></div>
@@ -1047,7 +1047,7 @@ async function refreshMe(){
 
 $("login").addEventListener("submit", async e => {
   e.preventDefault();
-  const msg = $("lmsg"), login = $("user").value.trim(), password = $("pass").value;
+  const msg = $("lmsg"), login = $("user").value.trim().slice(0, 64), password = $("pass").value.slice(0, 200);
   if (!login || !password){ msg.className = "msg on"; msg.textContent = "Заполни оба поля."; return; }
   if (OFFLINE){ msg.className = "msg on"; msg.textContent = "Страница открыта файлом — входить некуда."; return; }
   const r = await api("/api/login", { method:"POST", headers:{"Content-Type":"application/json"},
