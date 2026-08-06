@@ -35,7 +35,7 @@ metadata:
   name: hub-api
   namespace: hub
   annotations:
-    traefik.ingress.kubernetes.io/router.middlewares: hub-api-headers@kubernetescrd
+    traefik.ingress.kubernetes.io/router.middlewares: hub-limit-body@kubernetescrd,hub-api-headers@kubernetescrd
 spec:
   ingressClassName: traefik
   rules:

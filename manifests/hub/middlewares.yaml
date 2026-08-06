@@ -44,3 +44,12 @@ spec:
     referrerPolicy: strict-origin-when-cross-origin
     stsSeconds: 15552000
     forceSTSHeader: true
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: limit-body
+  namespace: hub
+spec:
+  buffering:
+    maxRequestBodyBytes: 32768
