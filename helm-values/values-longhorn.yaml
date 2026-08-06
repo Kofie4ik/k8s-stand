@@ -1,5 +1,5 @@
 persistence:
-  defaultClass: false
+  defaultClass: true
   defaultClassReplicaCount: 2
   reclaimPolicy: Delete
 
