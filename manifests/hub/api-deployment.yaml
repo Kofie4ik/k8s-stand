@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
         - name: api
-          image: registry.pivasik.org/hub-api:0.2.0
+          image: registry.pivasik.org/hub-api:0.3.0
           # образ тянется из своего реестра по паролю из registries.yaml;
           # тег числовой, поэтому лишний поход в сеть при перезапуске не нужен
           imagePullPolicy: IfNotPresent

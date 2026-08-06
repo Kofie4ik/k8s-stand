@@ -193,6 +193,9 @@ kbd{font:inherit;font-size:.72rem;padding:2px 6px;border-radius:5px;line-height:
 .auth-panel .btn{width:100%;margin-top:2px}
 .auth-panel .note{margin-top:10px}
 .auth-panel .who{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.auth-panel #pwd{margin-top:14px}
+.auth-panel #u-revoke{margin-top:10px;width:100%;font-size:.82rem;white-space:nowrap}
+.auth-panel #pmsg:not(:empty){margin-top:8px}
 @media (max-width:560px){.authdrop .drop-panel{right:-8px;width:min(250px,88vw);padding:14px}}
 .top-right{margin-left:auto;display:flex;align-items:center;gap:12px}
 .ghost{padding:7px 13px;border-radius:9px;font-size:.88rem}
@@ -521,8 +524,8 @@ kbd{background:var(--surf);border:1px solid var(--line);color:var(--dim)}
           <div id="auth-guest">
             <span class="lbl">Вход</span>
             <form id="login" autocomplete="off">
-              <input type="text" id="user" placeholder="Логин" autocomplete="username" maxlength="64">
-              <input type="password" id="pass" placeholder="Пароль" autocomplete="current-password" maxlength="200">
+              <input type="text" id="user" placeholder="Логин" autocomplete="username">
+              <input type="password" id="pass" placeholder="Пароль" autocomplete="current-password">
               <button class="btn" type="submit">Войти</button>
             </form>
             <div class="msg" id="lmsg"></div>
@@ -533,6 +536,15 @@ kbd{background:var(--surf);border:1px solid var(--line);color:var(--dim)}
               <b id="u-name">—</b><span id="u-role">—</span>
               <button class="ghost" type="button" id="u-quit">выйти</button>
             </div>
+            <form id="pwd" autocomplete="off">
+              <input type="password" id="p-old" placeholder="Текущий пароль"
+                     maxlength="200" autocomplete="current-password">
+              <input type="password" id="p-new" placeholder="Новый пароль, от 10 знаков"
+                     maxlength="200" autocomplete="new-password">
+              <button class="btn" type="submit">Сменить пароль</button>
+            </form>
+            <button class="ghost" type="button" id="u-revoke">выйти на других устройствах</button>
+            <div class="msg" id="pmsg"></div>
             <p class="note" id="u-note">Служебные сервисы появились в списке.</p>
           </div>
         </div>
@@ -1047,7 +1059,7 @@ async function refreshMe(){
 
 $("login").addEventListener("submit", async e => {
   e.preventDefault();
-  const msg = $("lmsg"), login = $("user").value.trim().slice(0, 64), password = $("pass").value.slice(0, 200);
+  const msg = $("lmsg"), login = $("user").value.trim(), password = $("pass").value;
   if (!login || !password){ msg.className = "msg on"; msg.textContent = "Заполни оба поля."; return; }
   if (OFFLINE){ msg.className = "msg on"; msg.textContent = "Страница открыта файлом — входить некуда."; return; }
   const r = await api("/api/login", { method:"POST", headers:{"Content-Type":"application/json"},
@@ -1062,6 +1074,34 @@ $("u-quit").addEventListener("click", async () => {
   await api("/api/logout", { method:"POST" });
   ME = { login:"", role:"guest" }; $("user").value = ""; applyRole();
   if (AUTHDROP) AUTHDROP.shut(0);
+});
+
+/* Смена пароля и отзыв чужих входов. Оба действия просят текущий пароль:
+   cookie может быть краденой, а пароля у вора нет. */
+const why = r => (r.body && typeof r.body.detail === "string") ? r.body.detail : "Не получилось.";
+
+$("pwd").addEventListener("submit", async e => {
+  e.preventDefault();
+  const msg = $("pmsg"), oldp = $("p-old").value, newp = $("p-new").value;
+  if (OFFLINE){ msg.className = "msg on"; msg.textContent = "Страница открыта файлом — менять негде."; return; }
+  if (!oldp || !newp){ msg.className = "msg on"; msg.textContent = "Заполни оба поля."; return; }
+  if (newp.length < 10){ msg.className = "msg on"; msg.textContent = "Новый пароль короче десяти знаков."; return; }
+  const r = await api("/api/password", { method:"POST", headers:{"Content-Type":"application/json"},
+                                         body:JSON.stringify({ old_password:oldp, new_password:newp }) });
+  msg.className = r.ok ? "msg" : "msg on";
+  msg.textContent = r.ok ? "Пароль изменён, остальные входы сброшены." : why(r);
+  if (r.ok){ $("p-old").value = ""; $("p-new").value = ""; }
+});
+
+$("u-revoke").addEventListener("click", async () => {
+  const msg = $("pmsg"), pwd = $("p-old").value;
+  if (OFFLINE){ msg.className = "msg on"; msg.textContent = "Страница открыта файлом — сбрасывать нечего."; return; }
+  if (!pwd){ msg.className = "msg on"; msg.textContent = "Введи текущий пароль в поле выше."; return; }
+  const r = await api("/api/sessions/revoke", { method:"POST", headers:{"Content-Type":"application/json"},
+                                                body:JSON.stringify({ password:pwd }) });
+  msg.className = r.ok ? "msg" : "msg on";
+  msg.textContent = r.ok ? "Остальные входы сброшены." : why(r);
+  if (r.ok) $("p-old").value = "";
 });
 
 $("compose").addEventListener("submit", async e => {
