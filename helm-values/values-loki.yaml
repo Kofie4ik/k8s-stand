@@ -41,6 +41,7 @@ singleBinary:
   persistence:
     enabled: true
     size: 10Gi
+    storageClass: longhorn
   resources:
     requests:
       cpu: 100m
