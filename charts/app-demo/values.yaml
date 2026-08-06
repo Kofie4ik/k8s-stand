@@ -3,7 +3,8 @@ postgres:
   db: demodb
   user: demo
   # пароля здесь нет: Secret pg-secret создаётся вручную и в git не хранится
-  storage: 2Gi
+  storage: 5Gi
+  storageClass: longhorn
 
 adminer:
   image: adminer:4
