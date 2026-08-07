@@ -13,7 +13,11 @@ defaultSettings:
   defaultDataPath: /var/lib/longhorn
   defaultReplicaCount: 2
   replicaSoftAntiAffinity: false
+
+defaultBackupStore:
   backupTarget: nfs://10.0.2.1/srv/longhorn-backup
+  backupTargetCredentialSecret: ""
+  pollInterval: 300
 
 longhornUI:
   replicas: 1

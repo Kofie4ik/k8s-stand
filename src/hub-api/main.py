@@ -18,6 +18,8 @@ import httpx
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError, VerificationError, InvalidHashError
 from fastapi import Cookie, Depends, FastAPI, Header, HTTPException, Request, Response
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
 from itsdangerous import BadSignature, SignatureExpired, URLSafeTimedSerializer
 from psycopg.rows import dict_row
 from psycopg_pool import ConnectionPool
@@ -72,6 +74,35 @@ app = FastAPI(title="hub-api", docs_url="/api/docs", openapi_url="/api/openapi.j
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# Ограничение размера запроса
+# ─────────────────────────────────────────────────────────────────────────────
+# Проверки длины полей срабатывают уже после разбора тела: к тому моменту
+# память съедена. Отсекаем по заголовку, не читая тело вовсе.
+# Второй рубеж — traefik: он ловит и запросы без Content-Length, а этот
+# код такой запрос пропустит.
+
+MAX_BODY = 32 * 1024
+
+
+@app.middleware("http")
+async def limit_body(request: Request, call_next):
+    cl = request.headers.get("content-length")
+    if cl and cl.isdigit() and int(cl) > MAX_BODY:
+        return JSONResponse({"detail": "запрос слишком большой"}, status_code=413)
+    return await call_next(request)
+
+
+@app.exception_handler(RequestValidationError)
+async def short_validation_error(request: Request, exc: RequestValidationError):
+    """FastAPI по умолчанию возвращает присланное значение обратно в тексте
+    ошибки. На длинном вводе ответ весит столько же, сколько запрос."""
+    return JSONResponse(
+        {"detail": [{"loc": e.get("loc"), "msg": e.get("msg")} for e in exc.errors()]},
+        status_code=422,
+    )
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # Сессии
 # ─────────────────────────────────────────────────────────────────────────────
 
@@ -83,13 +114,49 @@ class User(BaseModel):
 GUEST = User(login="", role="guest")
 
 
+def issue_session(response: Response, login: str, ver: int) -> None:
+    """Выдать cookie. Единственное место, где она создаётся — и при входе,
+    и после смены пароля, чтобы тот, кто меняет, не выкинул сам себя."""
+    token = signer.dumps({"login": login, "ver": ver})
+    response.set_cookie(
+        COOKIE_NAME, token,
+        max_age=SESSION_TTL,
+        httponly=True,      # JavaScript страницы cookie не увидит — защита от кражи при XSS
+        secure=COOKIE_SECURE,
+        samesite="lax",     # чужой сайт не дёрнет наши ручки от твоего имени
+        path="/",
+    )
+
+
+def bump_session_version(conn, login: str) -> int:
+    """Погасить все выданные cookie этого пользователя.
+
+    ЕДИНСТВЕННОЕ место, где счётчик двигается. Любая правка учётки — смена
+    пароля, смена роли, удаление — обязана проходить здесь. Если завести
+    второй путь, отзыв однажды тихо перестанет работать: ошибки не будет,
+    просто старые cookie останутся живыми.
+    """
+    row = conn.execute(
+        "update users set sess_ver = sess_ver + 1 where login = %s returning sess_ver",
+        (login,),
+    ).fetchone()
+    if not row:
+        raise HTTPException(status_code=404, detail="пользователь не найден")
+    return row["sess_ver"]
+
+
 def current_user(hub_session: Optional[str] = Cookie(default=None)) -> User:
     """Кто пришёл. Без действительной cookie — гость, это не ошибка.
 
-    Сессия — не случайная строка в базе, а подписанные данные в самой cookie.
-    Подделать её нельзя (подпись не сойдётся), а сервер не хранит ничего.
-    Обратная сторона: досрочно погасить чужую сессию невозможно — она просто
-    протухнет через SESSION_TTL.
+    Подпись говорит только о том, что cookie не подделали. Всё остальное
+    берём из базы: номер поколения сессии и роль. Поэтому смена пароля гасит
+    все входы сразу, удаление пользователя действует немедленно, а понижение
+    роли не ждёт, пока протухнет cookie с написанным в ней 'admin'.
+
+    Цена — запрос к базе на каждый вызов. Для одной реплики это доли
+    миллисекунды по первичному ключу; при росте сюда добавится кеш на
+    несколько секунд, и вместе с ним — окно, в котором отозванная cookie ещё
+    жива. Пока не нужно.
     """
     if not hub_session:
         return GUEST
@@ -97,7 +164,24 @@ def current_user(hub_session: Optional[str] = Cookie(default=None)) -> User:
         data = signer.loads(hub_session, max_age=SESSION_TTL)
     except (BadSignature, SignatureExpired):
         return GUEST
-    return User(login=data.get("login", ""), role=data.get("role", "reader"))
+
+    login, ver = data.get("login", ""), data.get("ver")
+    if not login or ver is None:
+        return GUEST        # cookie старого образца, без поколения
+
+    try:
+        with pool.connection() as conn:
+            row = conn.execute(
+                "select role, sess_ver from users where login = %s", (login,)
+            ).fetchone()
+    except Exception:
+        # База недоступна — считаем гостем, а не верим cookie на слово.
+        # Отказ в правах при аварии лучше, чем выданные права без проверки.
+        return GUEST
+
+    if not row or row["sess_ver"] != ver:
+        return GUEST
+    return User(login=login, role=row["role"])
 
 
 def require_admin(user: User = Depends(current_user)) -> User:
@@ -131,6 +215,17 @@ def note_attempt(ip: str) -> None:
 
 class LoginIn(BaseModel):
     login: str = Field(min_length=1, max_length=64)
+    password: str = Field(min_length=1, max_length=200)
+
+
+class PasswordIn(BaseModel):
+    old_password: str = Field(min_length=1, max_length=200)
+    # Нижняя граница у нового пароля, а не у старого: старый нужно принять
+    # любым, каким он был заведён, иначе человек не сможет его сменить.
+    new_password: str = Field(min_length=10, max_length=200)
+
+
+class RevokeIn(BaseModel):
     password: str = Field(min_length=1, max_length=200)
 
 
@@ -214,7 +309,8 @@ def login(data: LoginIn, request: Request, response: Response):
 
     with pool.connection() as conn:
         row = conn.execute(
-            "select login, pass_hash, role from users where login = %s", (data.login,)
+            "select login, pass_hash, role, sess_ver from users where login = %s",
+            (data.login,),
         ).fetchone()
 
     # Отвечаем одинаково и на несуществующий логин, и на неверный пароль:
@@ -232,22 +328,92 @@ def login(data: LoginIn, request: Request, response: Response):
         note_attempt(ip)
         raise HTTPException(status_code=401, detail="неверный логин или пароль")
 
-    token = signer.dumps({"login": row["login"], "role": row["role"]})
-    response.set_cookie(
-        COOKIE_NAME, token,
-        max_age=SESSION_TTL,
-        httponly=True,      # JavaScript страницы cookie не увидит — защита от кражи при XSS
-        secure=COOKIE_SECURE,
-        samesite="lax",     # чужой сайт не дёрнет наши ручки от твоего имени
-        path="/",
-    )
+    issue_session(response, row["login"], row["sess_ver"])
     return {"login": row["login"], "role": row["role"]}
 
 
 @app.post("/api/logout")
 def logout(response: Response):
+    """Выход на этом устройстве: просто убираем cookie у себя.
+
+    Остальные её копии, если они есть, продолжают работать — для них нужен
+    отзыв, /api/sessions/revoke.
+    """
     response.delete_cookie(COOKIE_NAME, path="/")
     return {"ok": True}
+
+
+@app.post("/api/password")
+def change_password(data: PasswordIn, request: Request, response: Response,
+                    user: User = Depends(current_user)):
+    """Смена пароля. Старый спрашиваем обязательно: cookie может быть краденой,
+    и без этой проверки вор менял бы пароль хозяину.
+    """
+    if user.role == "guest":
+        raise HTTPException(status_code=401, detail="нужно войти")
+
+    ip = request.client.host if request.client else "?"
+    if too_many_attempts(ip):
+        raise HTTPException(status_code=429, detail="слишком много попыток, подожди минуту")
+
+    if data.new_password == data.old_password:
+        raise HTTPException(status_code=400, detail="новый пароль совпадает со старым")
+
+    with pool.connection() as conn:
+        row = conn.execute(
+            "select pass_hash from users where login = %s", (user.login,)
+        ).fetchone()
+        if not row:
+            raise HTTPException(status_code=401, detail="нужно войти")
+        try:
+            hasher.verify(row["pass_hash"], data.old_password)
+        except (VerifyMismatchError, VerificationError, InvalidHashError):
+            note_attempt(ip)
+            raise HTTPException(status_code=401, detail="старый пароль не подходит")
+
+        conn.execute(
+            "update users set pass_hash = %s where login = %s",
+            (hasher.hash(data.new_password), user.login),
+        )
+        ver = bump_session_version(conn, user.login)
+
+    # Пароль и счётчик меняются в одной транзакции: если что-то упадёт между
+    # ними, не выйдет ни пароля без отзыва, ни отзыва без пароля.
+    issue_session(response, user.login, ver)
+    return {"ok": True, "detail": "пароль изменён, остальные входы сброшены"}
+
+
+@app.post("/api/sessions/revoke")
+def revoke_sessions(data: RevokeIn, request: Request, response: Response,
+                    user: User = Depends(current_user)):
+    """Выйти на всех остальных устройствах.
+
+    Пароль спрашиваем не из вредности: без него укравший cookie одним нажатием
+    выкидывает хозяина и остаётся один. Опасное действие подтверждается тем,
+    чего у вора нет.
+    """
+    if user.role == "guest":
+        raise HTTPException(status_code=401, detail="нужно войти")
+
+    ip = request.client.host if request.client else "?"
+    if too_many_attempts(ip):
+        raise HTTPException(status_code=429, detail="слишком много попыток, подожди минуту")
+
+    with pool.connection() as conn:
+        row = conn.execute(
+            "select pass_hash from users where login = %s", (user.login,)
+        ).fetchone()
+        if not row:
+            raise HTTPException(status_code=401, detail="нужно войти")
+        try:
+            hasher.verify(row["pass_hash"], data.password)
+        except (VerifyMismatchError, VerificationError, InvalidHashError):
+            note_attempt(ip)
+            raise HTTPException(status_code=401, detail="пароль не подходит")
+        ver = bump_session_version(conn, user.login)
+
+    issue_session(response, user.login, ver)
+    return {"ok": True, "detail": "остальные входы сброшены"}
 
 
 @app.get("/api/me", response_model=User)

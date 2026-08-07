@@ -1,0 +1,11 @@
+apiVersion: longhorn.io/v1beta2
+kind: BackupTarget
+metadata:
+  name: default
+  namespace: longhorn-system
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false
+spec:
+  backupTargetURL: nfs://10.0.2.1:/srv/longhorn-backup
+  credentialSecret: ""
+  pollInterval: 5m0s

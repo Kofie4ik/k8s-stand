@@ -12,6 +12,10 @@ create table if not exists users (
   pass_hash  text        not null,
   role       text        not null default 'reader'
              check (role in ('reader', 'admin')),
+  -- Поколение сессий. Номер кладётся в cookie при входе и сверяется при каждом
+  -- запросе. Смена пароля или сброс входов увеличивают его — и все выданные
+  -- ранее cookie перестают сходиться. Отдельной таблицы сессий не нужно.
+  sess_ver   integer     not null default 1,
   created_at timestamptz not null default now()
 );
 
