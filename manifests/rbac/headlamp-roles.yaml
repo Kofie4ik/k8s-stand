@@ -25,8 +25,5 @@ metadata:
   name: headlamp-pod-restart
 rules:
   - apiGroups: [""]
-    resources: ["pods"]
-    verbs: ["delete"]
-  - apiGroups: [""]
     resources: ["pods/eviction"]
     verbs: ["create"]

@@ -11,6 +11,7 @@ spec:
     metadata:
       labels: { app: hub-api }
     spec:
+      automountServiceAccountToken: false
       containers:
         - name: api
           image: registry.pivasik.org/hub-api:0.4.0
