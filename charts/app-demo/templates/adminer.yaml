@@ -14,6 +14,7 @@ spec:
       labels:
         app: adminer
     spec:
+      automountServiceAccountToken: false
       containers:
         - name: adminer
           image: {{ .Values.adminer.image }}
