@@ -13,6 +13,7 @@ spec:
       labels:
         app: game
     spec:
+      automountServiceAccountToken: false
       containers:
         - name: nginx
           image: nginx:alpine
