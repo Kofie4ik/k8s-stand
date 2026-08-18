@@ -8,16 +8,38 @@ resources:
   - api-service.yaml
   - web-deployment.yaml
   - web-service.yaml
-  - middlewares.yaml
   - ingress.yaml
   # добавится после kubeseal — см. README-hub.md
-  - sealedsecret.yaml
+  # - sealedsecret.yaml
 
 configMapGenerator:
   # Страница едет в кластер как ConfigMap, собранный из файла на лету.
   - name: hub-html
     files:
       - index.html=html/index.html
+
+  # Шрифты. Отдельный ConfigMap, а не ключи в hub-html: имя ключа не может
+  # содержать «/», значит подпапку fonts/ одним ConfigMap'ом не сделать.
+  # Файлы двоичные — kustomize сам разложит их в binaryData.
+  # Вместе это 164 КБ, в base64 около 220 КБ: до потолка ConfigMap в 1 МБ далеко.
+  - name: hub-fonts
+    files:
+      - html/fonts/literata-cyrillic-400-normal.woff2
+      - html/fonts/literata-cyrillic-400-italic.woff2
+      - html/fonts/literata-cyrillic-500-normal.woff2
+      - html/fonts/literata-latin-400-normal.woff2
+      - html/fonts/literata-latin-400-italic.woff2
+      - html/fonts/literata-latin-500-normal.woff2
+      - html/fonts/ibm-plex-mono-cyrillic-400-normal.woff2
+      - html/fonts/ibm-plex-mono-cyrillic-500-normal.woff2
+      - html/fonts/ibm-plex-mono-latin-400-normal.woff2
+      - html/fonts/ibm-plex-mono-latin-500-normal.woff2
+
+  # Конфиг nginx: адреса разделов, честная 404 и заголовки безопасности.
+  # Заменяет стандартный default.conf из образа.
+  - name: hub-nginx
+    files:
+      - default.conf=conf/default.conf
 
   # Адрес Prometheus внутри кластера. Имя взято с самого стенда:
   #   kubectl -n monitoring get svc | grep -i prometheus

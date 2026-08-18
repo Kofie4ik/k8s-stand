@@ -1,1330 +1,1409 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>pivasik · хаб</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>pivasik — домашний стенд</title>
+
+<!--
+  НОВАЯ СТРАНИЦА. Пройдены шаги 1–3 из пяти.
+  Есть всё: шрифты, три настроения, шапка с подвалом, четыре раздела с
+  настоящими адресами и 404. Данные пока демонстрационные — они лежат в
+  переменных, и шагом 4 их наполнит бэкенд.
+  Внешних запросов файл не делает ни одного: шрифты лежат рядом, в fonts/.
+-->
+
 <style>
+/* ── Шрифты ──────────────────────────────────────────────────────────────
+   Два начертания на семейство и раздельные файлы под кириллицу и латиницу.
+   unicode-range говорит браузеру, какие буквы в каком файле: открыл русский
+   текст — латинский файл (он вдвое тяжелее) даже не скачается.
+   font-display:swap — сначала показать текст запасным шрифтом, потом
+   переставить. Пустая страница в ожидании шрифта хуже смены начертания. */
 
-*{box-sizing:border-box;margin:0;padding:0}
-html{-webkit-text-size-adjust:100%}
-body{
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,sans-serif;
-  font-size:16px;line-height:1.55;
-  -webkit-font-smoothing:antialiased;
-}
-img,svg{display:block;max-width:100%}
-button,input,textarea{font:inherit;color:inherit}
-button{background:none;border:0;cursor:pointer}
+@font-face{font-family:Literata;font-style:normal;font-weight:400;font-display:swap;
+  src:url(fonts/literata-cyrillic-400-normal.woff2) format('woff2');
+  unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:Literata;font-style:normal;font-weight:400;font-display:swap;
+  src:url(fonts/literata-latin-400-normal.woff2) format('woff2');
+  unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+2074,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:Literata;font-style:normal;font-weight:500;font-display:swap;
+  src:url(fonts/literata-cyrillic-500-normal.woff2) format('woff2');
+  unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:Literata;font-style:normal;font-weight:500;font-display:swap;
+  src:url(fonts/literata-latin-500-normal.woff2) format('woff2');
+  unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+2074,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:Literata;font-style:italic;font-weight:400;font-display:swap;
+  src:url(fonts/literata-cyrillic-400-italic.woff2) format('woff2');
+  unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:Literata;font-style:italic;font-weight:400;font-display:swap;
+  src:url(fonts/literata-latin-400-italic.woff2) format('woff2');
+  unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+2074,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+
+@font-face{font-family:'Plex Mono';font-style:normal;font-weight:400;font-display:swap;
+  src:url(fonts/ibm-plex-mono-cyrillic-400-normal.woff2) format('woff2');
+  unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:'Plex Mono';font-style:normal;font-weight:400;font-display:swap;
+  src:url(fonts/ibm-plex-mono-latin-400-normal.woff2) format('woff2');
+  unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+2074,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Plex Mono';font-style:normal;font-weight:500;font-display:swap;
+  src:url(fonts/ibm-plex-mono-cyrillic-500-normal.woff2) format('woff2');
+  unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:'Plex Mono';font-style:normal;font-weight:500;font-display:swap;
+  src:url(fonts/ibm-plex-mono-latin-500-normal.woff2) format('woff2');
+  unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+2074,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+
+/* ── Три настроения ──────────────────────────────────────────────────────
+   Весь цвет живёт переменными. Смена настроения — это смена одного класса
+   на <body>, ни одна другая строка стилей об этом не знает. */
+
+body.j-warm{--bg:#f7f3ea;--paper:#fffdf8;--soft:#efe8db;--line:#ded4c2;--line2:#c8bba3;
+  --ink:#1f1b15;--dim:#6d6355;--acc:#9c3b28;--on-acc:#fdf7f0;--ok:#4c6b3c;--bad:#a83226;color-scheme:light}
+body.j-dark{--bg:#131210;--paper:#1a1815;--soft:#201d19;--line:#2c2823;--line2:#3d3831;
+  --ink:#ece5da;--dim:#8b8175;--acc:#e08a63;--on-acc:#1a1005;--ok:#8fb87a;--bad:#e2705f;color-scheme:dark}
+body.j-light{--bg:#fafaf9;--paper:#fff;--soft:#f1f1ef;--line:#e2e2df;--line2:#c9c9c4;
+  --ink:#16161a;--dim:#63636b;--acc:#b03a24;--on-acc:#fff;--ok:#3f7040;--bad:#b03a24;color-scheme:light}
+
+/* ── Основа ──────────────────────────────────────────────────────────── */
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:Literata,Georgia,serif;font-size:17px;line-height:1.5;
+  -webkit-font-smoothing:antialiased;padding-bottom:70px}
 a{color:inherit;text-decoration:none}
-.hidden{display:none !important}
+a:hover{color:var(--acc)}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
 
-.skip{position:absolute;left:-9999px;top:0;padding:10px 16px;background:#000;color:#fff;z-index:99}
-.skip:focus{left:8px;top:8px}
+.wrap{max-width:1120px;margin:0 auto;padding:0 32px}
+.mono{font-family:'Plex Mono',ui-monospace,monospace}
+.caps{font-family:'Plex Mono',ui-monospace,monospace;font-size:.66rem;
+  text-transform:uppercase;letter-spacing:.18em;color:var(--dim)}
+.dim{color:var(--dim)}
+.acc{color:var(--acc)}
 
-.wrap{width:100%;max-width:1180px;margin:0 auto;padding:0 24px}
-.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
-/* Плотный вид — единственный: меньше воздуха, больше видно за раз */
-.block{margin:44px 0}
-.block-h{display:flex;align-items:baseline;gap:14px;margin-bottom:22px;flex-wrap:wrap}
-.block-h h2{font-size:2.1rem;font-weight:800;letter-spacing:-.025em;line-height:1.1}
-.block-h .sub{font-size:.9rem}
+h1{margin:0;font-weight:400;line-height:1.03;letter-spacing:-.025em;
+  font-size:clamp(2.4rem,5vw,4.2rem);text-wrap:pretty}
+h1 em{font-style:italic;color:var(--acc)}
+h2{margin:0;font-weight:400;font-size:2rem;letter-spacing:-.02em}
+p{text-wrap:pretty}
 
-/* ── Точка состояния сервиса ─────────────────────────────────────── */
-.st{width:8px;height:8px;border-radius:50%;flex:none;display:inline-block}
-.st.wait{background:#b8b8b8}
-.st.up{background:#16a34a}
-.st.down{background:#dc2626}
+/* ── Шапка ───────────────────────────────────────────────────────────── */
 
-/* ── Спарклайн ───────────────────────────────────────────────────── */
-.spark-box{position:relative;margin-top:14px;cursor:crosshair;touch-action:none}
-.spark{width:100%;height:48px;overflow:visible;display:block}
-/* Курсор и точка — обычные элементы поверх линии, а не фигуры внутри svg:
-   у линии preserveAspectRatio="none", и круг в ней превратился бы в овал. */
-.sp-cursor,.sp-dot{position:absolute;opacity:0;pointer-events:none;
-                   transition:opacity .12s ease}
-.sp-cursor{top:0;bottom:0;width:1px;background:currentColor;opacity:0;
-           transform:translateX(-.5px)}
-.sp-dot{width:9px;height:9px;border-radius:50%;background:currentColor;
-        transform:translate(-50%,-50%)}
-.probing .sp-cursor{opacity:.45}
-.probing .sp-dot{opacity:1}
-/* время замера появляется рядом с числом только под курсором */
-.m-at{font-size:.78rem;opacity:0;transition:opacity .12s ease;
-      font-variant-numeric:tabular-nums;white-space:nowrap}
-.probing .m-at{opacity:.75}
-.sp-line{fill:none;stroke-width:2;vector-effect:non-scaling-stroke;
-         stroke-linejoin:round;stroke-linecap:round;
-         stroke-dasharray:1400;stroke-dashoffset:1400;
-         transition:stroke-dashoffset 1.5s cubic-bezier(.22,1,.36,1)}
-.seen .sp-line{stroke-dashoffset:0}
-.sp-fill{stroke:none;opacity:0}
-.seen .sp-fill{opacity:1;transition:opacity .9s ease .5s}
+header{border-bottom:1px solid var(--ink);position:sticky;top:0;z-index:30;background:var(--bg)}
+.head{display:flex;align-items:baseline;gap:20px;padding-top:13px;padding-bottom:13px}
+.brand{display:flex;align-items:baseline;gap:9px}
+.brand b{font-weight:500;font-size:1.5rem;letter-spacing:-.02em}
+.brand i{font-style:normal;font-size:1.15rem}
+nav{margin-left:auto;display:flex;align-items:baseline;gap:22px;
+  font-family:'Plex Mono',ui-monospace,monospace;font-size:.72rem;
+  text-transform:uppercase;letter-spacing:.16em}
+nav a{padding-bottom:2px;border-bottom:1px solid transparent;color:var(--dim)}
+nav a.on{color:var(--ink);border-bottom-color:var(--ink)}
+nav a.enter{color:var(--acc);border-bottom-color:var(--acc)}
+.health{display:flex;align-items:baseline;gap:8px;color:var(--dim)}
+.health i{width:6px;height:6px;border-radius:50%;background:var(--dim);display:inline-block}
+.health.up i{background:var(--ok)}
+.health.down i{background:var(--bad)}
 
-/* ── Кольцо ──────────────────────────────────────────────────────── */
-.ring-card{text-align:center}
-.ring-box{position:relative;width:150px;height:150px;margin:4px auto 0}
-.ring{width:150px;height:150px;transform:rotate(-90deg)}
-.ring circle{fill:none;stroke-width:9;stroke-linecap:round}
-.ring-fg{transition:stroke-dashoffset 1.1s cubic-bezier(.22,1,.36,1)}
-/* inset:0 по обёртке кольца — число ровно в его середине */
-.ring-mid{position:absolute;inset:0;
-          display:flex;flex-direction:column;align-items:center;justify-content:center;
-          pointer-events:none}
-.ring-mid b{font-size:2.6rem;font-weight:800;line-height:1;letter-spacing:-.03em}
-.ring-mid span{font-size:.8rem}
-.ring-cap{margin-top:10px;font-size:.88rem}
+/* ── Разделы ─────────────────────────────────────────────────────────────
+   Все четыре лежат в разметке сразу, показывается один. Так переход между
+   разделами ничего не перерисовывает с нуля и не мигает. */
 
-/* ── Список сервисов ─────────────────────────────────────────────── */
-.svc-wrap{display:grid;grid-template-columns:280px 1fr;gap:20px;align-items:start}
-.svc-g{margin-bottom:8px}
-.svc-gt{display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:.12em;
-        margin:0 0 8px 2px}
-.svc{display:flex;align-items:center;gap:14px;padding:13px 16px}
-.svc-ic{font-size:1.15rem;width:26px;text-align:center;flex:none}
-.svc-bd{display:flex;flex-direction:column;min-width:0;flex:1}
-.svc-bd b{font-weight:650;font-size:.98rem}
-.svc-bd span{font-size:.82rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+[data-page]{display:none}
+[data-page].on{display:block}
+.sect{border-bottom:1px solid var(--line)}
+.head-two{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);
+  gap:44px;align-items:end;padding-top:44px}
+.aside{border-left:1px solid var(--line);padding-left:28px}
+.lead{margin:14px 0 0;max-width:540px;font-size:1.1rem;color:var(--dim)}
+.stub{padding:26px 0 60px;color:var(--dim);font-style:italic}
 
-/* ── Лента ───────────────────────────────────────────────────────── */
-/* Вход уехал в шапку — лента занимает всю ширину */
-.feed-wrap{display:block}
-.item-h{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px}
-.item-h h3{font-size:1.06rem;font-weight:700;flex:1;min-width:0}
-.who{font-size:.66rem;text-transform:uppercase;letter-spacing:.1em;padding:3px 8px;border-radius:999px;font-weight:700}
-.when{font-size:.8rem;font-variant-numeric:tabular-nums}
-.feed-msg{padding:22px;font-size:.94rem}
+.pad-sect{padding:30px 0 34px}
+.h-row{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+.two-eq{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:44px;padding:30px 0 40px}
 
-/* ── Формы ───────────────────────────────────────────────────────── */
-.compose input,.compose textarea,.auth input{
-  width:100%;padding:11px 13px;border-radius:10px;outline:0;margin-bottom:9px}
-.compose textarea{min-height:96px;resize:vertical}
-.compose .row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.btn{padding:11px 20px;border-radius:10px;font-weight:650;cursor:pointer}
-.lbl{display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:.12em;margin-bottom:14px}
-.note{font-size:.8rem;line-height:1.5;margin-top:12px}
-.hint{font-size:.8rem}
-.msg{font-size:.84rem;min-height:1.2em}
-.who{white-space:nowrap}
-.auth .who{display:flex;align-items:center;gap:10px;text-transform:none;letter-spacing:0;
-           font-size:1rem;padding:0;border-radius:0;font-weight:400;background:none}
+/* Определения «в двух словах» и сводка кластера */
+.dl{margin:14px 0 0;display:grid;grid-template-columns:auto 1fr;gap:9px 16px;
+  font-family:'Plex Mono',ui-monospace,monospace;font-size:.82rem}
+.dl dt{color:var(--dim)}
+.dl dd{margin:0}
 
-/* ── Железячка: одна строка в подвале ────────────────────────────── */
-.rig{position:relative;display:inline-flex;align-items:baseline;gap:7px;flex-wrap:wrap;
-     cursor:help;outline:0}
-.rig-k{font-size:.72rem;text-transform:uppercase;letter-spacing:.11em;margin-right:3px}
-.rig .v{font-weight:650}
-.rig i{font-style:normal;opacity:.45}
-/* пояснение показывается по наведению и по фокусу с клавиатуры */
-.rig-note{position:absolute;right:0;bottom:calc(100% + 10px);width:min(340px,80vw);
-  padding:14px 16px;font-size:.78rem;line-height:1.5;text-align:left;font-weight:400;
-  text-transform:none;letter-spacing:0;
-  background:var(--surf,#fff);border:1px solid var(--line,#e5e7eb);
-  border-radius:var(--r,14px);box-shadow:0 14px 34px var(--shadow-deep,rgba(0,0,0,.18));
-  opacity:0;visibility:hidden;transform:translateY(4px);
-  transition:opacity .16s ease,transform .16s ease,visibility .16s;z-index:30}
-.rig:hover .rig-note,.rig:focus-visible .rig-note{opacity:1;visibility:visible;transform:none}
+/* ── Линия метрик ─────────────────────────────────────────────────────────
+   Курсор и точки — обычные элементы поверх svg, а не фигуры внутри него.
+   У линии preserveAspectRatio="none", она тянется по ширине неравномерно,
+   и круг, нарисованный внутри, превратился бы в овал. */
 
-/* ── Палитра команд ──────────────────────────────────────────────── */
-.pal-scrim{position:fixed;inset:0;z-index:80;opacity:0;pointer-events:none;transition:opacity .16s ease}
-body.pal-on .pal-scrim{opacity:1;pointer-events:auto}
-.pal{position:fixed;z-index:81;left:50%;top:14vh;width:min(620px,92vw);
-     transform:translate(-50%,-8px);opacity:0;pointer-events:none;
-     transition:opacity .16s ease,transform .16s ease;overflow:hidden}
-body.pal-on .pal{opacity:1;pointer-events:auto;transform:translate(-50%,0)}
-.pal input{width:100%;padding:18px 20px;border:0;outline:0;font-size:1.05rem}
-.pal-list{max-height:44vh;overflow:auto}
-.pal-i{display:flex;align-items:center;gap:12px;padding:11px 20px;cursor:pointer}
-.pal-i b{font-weight:650;font-size:.96rem;flex:none}
-.pi-ic{width:22px;text-align:center;flex:none}
-.pi-sub{font-size:.82rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.pal-none{padding:22px 20px;font-size:.92rem}
-.pal-foot{padding:11px 20px;font-size:.76rem;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
-kbd{font:inherit;font-size:.72rem;padding:2px 6px;border-radius:5px;line-height:1.4}
+.chartbox{cursor:crosshair;touch-action:none;margin-top:36px}
+.strip{display:flex;align-items:baseline;gap:26px;flex-wrap:wrap;
+  font-family:'Plex Mono',ui-monospace,monospace;padding-bottom:10px}
+.pair{display:flex;align-items:baseline;gap:9px}
+.big{font-family:Literata,Georgia,serif;font-size:1.9rem;font-weight:400;letter-spacing:-.02em}
+.sub{font-size:.76rem;color:var(--dim)}
+.chart{position:relative;border-top:1px solid var(--line)}
+.chart svg{width:100%;height:96px;display:block}
+.ln-cpu{fill:none;stroke:var(--acc);stroke-width:1.5;vector-effect:non-scaling-stroke}
+.ln-ram{fill:none;stroke:var(--ink);stroke-width:1;vector-effect:non-scaling-stroke;opacity:.42}
+.fl-cpu{stroke:none;fill:var(--acc);opacity:.1}
+.ln-ink{fill:none;stroke:var(--ink);stroke-width:1.5;vector-effect:non-scaling-stroke}
+.fl-ram{stroke:none;fill:var(--ink);opacity:.07}
+.cursor{position:absolute;top:0;bottom:0;width:1px;background:var(--ink);
+  pointer-events:none;opacity:0;left:0}
+.dot{position:absolute;width:7px;height:7px;border-radius:50%;
+  transform:translate(-50%,-50%);pointer-events:none;opacity:0;left:0;top:0}
+.dot-cpu{background:var(--acc)}
+.dot-ram{background:var(--ink);width:6px;height:6px}
+.note{margin:0;padding:8px 0 26px;font-size:.68rem;color:var(--dim)}
 
-/* ── Шапка и подвал ──────────────────────────────────────────────── */
-.top{position:sticky;top:0;z-index:40}
-.top-in{display:flex;align-items:center;gap:22px;height:64px}
-.brand{display:flex;align-items:baseline;gap:9px;font-size:1.12rem}
-.brand .mark{font-style:normal;font-size:1.1rem}
-.brand b{font-weight:800;letter-spacing:-.02em}
-.brand-sub{font-size:.78rem}
-.top-nav{display:flex;gap:4px;margin-left:14px;align-items:center}
+/* Крупное число в боковой колонке раздела */
+.huge{display:block;font-size:3.4rem;font-weight:400;letter-spacing:-.03em;line-height:1}
+.big.tall{font-size:2.6rem;line-height:1}
 
-/* ── Выпадающая панель сервисов ──────────────────────────────────── */
-.navdrop{position:relative}
-.drop-btn{display:inline-flex;align-items:center;gap:8px}
-.chev{width:7px;height:7px;flex:none;opacity:.55;
-      border-right:1.7px solid currentColor;border-bottom:1.7px solid currentColor;
-      transform:rotate(45deg) translate(-2px,-2px);transition:transform .18s ease}
-.navdrop.on .chev{transform:rotate(-135deg) translate(-3px,-3px)}
-/* Ширина по содержимому: гость видит одну группу и панель не растягивается
-   пустотой, вошедший — две колонки во всю ширину. */
-.drop-panel{position:absolute;top:calc(100% + 12px);left:-12px;z-index:45;
-  width:max-content;max-width:min(760px,92vw);
-  background:var(--surf,#fff);border:1px solid var(--line,#e5e7eb);
-  border-radius:var(--r,18px);box-shadow:0 22px 54px var(--shadow-deep,rgba(0,0,0,.18));
-  opacity:0;visibility:hidden;transform:translateY(-6px);
-  transition:opacity .16s ease,transform .16s ease,visibility .16s}
-.navdrop.on .drop-panel{opacity:1;visibility:visible;transform:none}
-/* мостик через зазор: без него курсор на пути к панели выходит наружу */
-.drop-panel::before{content:"";position:absolute;left:0;right:0;top:-14px;height:14px}
-/* Группы стоят колонками рядом. Флексом, а не сеткой: при ширине
-   «по содержимому» auto-fit схлопывает сетку в одну колонку. */
-.drop-in{display:flex;flex-wrap:wrap;align-items:flex-start;gap:0 10px;padding:10px;
-         max-height:min(66vh,540px);overflow:auto}
-.drop-in .svc-g{flex:1 1 300px;min-width:290px}
-.drop-in .svc-gt{margin:10px 0 6px}
-.drop-in .svc{padding:10px 12px;border-radius:calc(var(--r,18px) - 8px)}
-.drop-in .svc:hover{background:var(--soft,#f2f2f5)}
-.drop-foot{display:flex;align-items:center;gap:12px;flex-wrap:wrap;
-  padding:10px 16px;font-size:.8rem;color:var(--dim,#8a8a94);
-  border-top:1px solid var(--line,#e5e7eb)}
-.drop-foot .ghost{margin-left:auto;font-size:.8rem;padding:4px 10px}
-/* На узком экране верхнее меню скрыто целиком — прятать нужно только
-   панель сервисов. Вход обязан работать и с телефона. */
-@media (max-width:900px){#drop-panel{display:none}}
+/* ── Группы сервисов и записи журнала ────────────────────────────────── */
 
-/* ── Вход в шапке ────────────────────────────────────────────────── */
-.authdrop{margin-left:2px}
-.authdrop .drop-panel{left:auto;right:-8px;width:min(258px,92vw);padding:16px}
-.auth-panel .lbl{margin-bottom:10px}
-.auth-panel form{display:flex;flex-direction:column}
-.auth-panel .btn{width:100%;margin-top:2px}
-.auth-panel .note{margin-top:10px}
-.auth-panel .who{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.auth-panel #pwd{margin-top:14px}
-.auth-panel #u-revoke{margin-top:10px;width:100%;font-size:.82rem;white-space:nowrap}
-.auth-panel #pmsg:not(:empty){margin-top:8px}
-@media (max-width:560px){.authdrop .drop-panel{right:-8px;width:min(250px,88vw);padding:14px}}
-.top-right{margin-left:auto;display:flex;align-items:center;gap:12px}
-.ghost{padding:7px 13px;border-radius:9px;font-size:.88rem}
-.kbd-btn{display:flex;align-items:center;gap:6px;padding:7px 11px;border-radius:9px;font-size:.86rem}
-.health{display:flex;align-items:center;gap:7px;padding:6px 12px;border-radius:999px;
-        font-size:.86rem;font-variant-numeric:tabular-nums}
-.foot-bar{padding:28px 0 40px;font-size:.84rem}
-.foot-bar .wrap{display:flex;justify-content:space-between;align-items:center;
-                gap:14px 24px;flex-wrap:wrap}
+.grp{margin-bottom:26px}
+.grp > .caps{display:block;margin-bottom:6px}
+.note-guest{margin:0;border-top:1px solid var(--ink);padding-top:12px;
+  font-family:'Plex Mono',ui-monospace,monospace;font-size:.7rem;color:var(--dim)}
+.jrow{border-top:1px solid var(--line);padding:18px 0;
+  display:grid;grid-template-columns:150px minmax(0,1fr);gap:0 24px}
+.jrow .when{flex-direction:column;align-items:flex-start;gap:5px}
+.jrow h3{margin:0;font-weight:500;font-size:1.5rem;line-height:1.15;letter-spacing:-.015em}
+.jrow p{margin:7px 0 0;font-size:1.06rem;color:var(--dim);max-width:64ch}
 
-/* ── Появление секций ────────────────────────────────────────────── */
-.block,.card{opacity:0;transform:translateY(14px);
-             transition:opacity .5s ease,transform .5s cubic-bezier(.22,1,.36,1)}
-.block.seen,.card.seen{opacity:1;transform:none}
+/* ── Форма записи ────────────────────────────────────────────────────── */
 
-/* ── Уважение к системной настройке ──────────────────────────────── */
-@media (prefers-reduced-motion:reduce){
-  *{transition:none !important;animation:none !important}
-  .block,.card{opacity:1;transform:none}
-  .sp-line{stroke-dashoffset:0}.sp-fill{opacity:1}
-}
+.form{border:1px solid var(--ink);background:var(--paper);padding:18px 20px;margin-bottom:26px}
+.form input,.form textarea{display:block;width:100%;border-radius:0;
+  font-family:Literata,Georgia,serif;padding:9px 11px;
+  border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+.form input{font-size:1.3rem;margin-bottom:10px}
+.form textarea{font-size:1.02rem;min-height:88px;resize:vertical}
+.form .foot-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:12px}
+.btn{padding:10px 18px;background:var(--acc);color:var(--on-acc);border:0;cursor:pointer;
+  font-family:'Plex Mono',ui-monospace,monospace;font-size:.68rem;
+  text-transform:uppercase;letter-spacing:.16em}
+.ghost{background:none;border:1px solid var(--line2);color:var(--ink)}
+.authform{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap;padding-top:16px;padding-bottom:16px}
+.authform label{display:flex;flex-direction:column;gap:5px}
+.authform input{width:180px;border-radius:0;padding:8px 10px;
+  font-family:'Plex Mono',ui-monospace,monospace;font-size:.86rem;letter-spacing:0;
+  text-transform:none;border:1px solid var(--line2);background:var(--bg);color:var(--ink)}
 
-/* ── Узкий экран ─────────────────────────────────────────────────── */
-@media (max-width:900px){
-  .grid-2,.svc-wrap,.feed-wrap{grid-template-columns:1fr}
-  .block-h h2{font-size:1.7rem}
-  .top-nav{display:none}
-  .block{margin:48px 0}
-}
-@media (max-width:560px){
-  .wrap{padding:0 16px}
-  .kbd-btn span{display:none}
-  .brand-sub{display:none}
-}
+/* ── Строка сервиса ─────────────────────────────────────────────────── */
 
-:root{
-
-  --bg:radial-gradient(1200px 700px at 15% -10%, #16202e 0%, #0f1520 55%, #0d121b 100%);
-  --surf:#141b26; --soft:#111823; --line:#212b3a;
-  --ink:#e6ecf5; --dim:#8b97a8;
-  --acc:#5eead4; --on-acc:#08201d;
-  --acc2:#7fc7e8; --on-acc2:#07202c;
-  /* тёмное настроение бережёт акцент: плитка — приглушённая подложка,
-     цветом горят только цифры и линия */
-  --tile1:#14302b; --on-tile1:#8ff2e0;
-  --tile2:#152838; --on-tile2:#a3d8f2;
-  --tile-line:#22463f; --tile-soft:rgba(255,255,255,.09);
-  --ok:#43c98a; --warn:#e3b341; --on-warn:#241c04; --bad:#e46a72;
-  --r:18px; --sh:none;
-  --top-bg:rgba(13,18,27,.82);
-  --hero-bg:linear-gradient(140deg,#1a2432 0%,#141b26 60%,#161f2e 100%);
-  --hero-ink:#eef3fb; --hero-dim:#8b97a8; --hero-acc:#5eead4;
-  --hero-line:#212b3a; --hero-line2:rgba(255,255,255,.09);
-  --badge-sys-bg:#1a2a3a; --badge-sys-fg:#7fc7e8;
-  --badge-man-bg:#12332e; --badge-man-fg:#5eead4;
-  --btn-bg:#5eead4; --btn-fg:#08201d;
-  --knob:#2a3444; --knob-dot:#9aa7b8;
-  --scrim:rgba(4,7,12,.62); --shadow-deep:rgba(0,0,0,.55);
-  color-scheme:dark;
-}
-body.m-dark{
-
-  --bg:radial-gradient(1200px 700px at 15% -10%, #16202e 0%, #0f1520 55%, #0d121b 100%);
-  --surf:#141b26; --soft:#111823; --line:#212b3a;
-  --ink:#e6ecf5; --dim:#8b97a8;
-  --acc:#5eead4; --on-acc:#08201d;
-  --acc2:#7fc7e8; --on-acc2:#07202c;
-  /* тёмное настроение бережёт акцент: плитка — приглушённая подложка,
-     цветом горят только цифры и линия */
-  --tile1:#14302b; --on-tile1:#8ff2e0;
-  --tile2:#152838; --on-tile2:#a3d8f2;
-  --tile-line:#22463f; --tile-soft:rgba(255,255,255,.09);
-  --ok:#43c98a; --warn:#e3b341; --on-warn:#241c04; --bad:#e46a72;
-  --r:18px; --sh:none;
-  --top-bg:rgba(13,18,27,.82);
-  --hero-bg:linear-gradient(140deg,#1a2432 0%,#141b26 60%,#161f2e 100%);
-  --hero-ink:#eef3fb; --hero-dim:#8b97a8; --hero-acc:#5eead4;
-  --hero-line:#212b3a; --hero-line2:rgba(255,255,255,.09);
-  --badge-sys-bg:#1a2a3a; --badge-sys-fg:#7fc7e8;
-  --badge-man-bg:#12332e; --badge-man-fg:#5eead4;
-  --btn-bg:#5eead4; --btn-fg:#08201d;
-  --knob:#2a3444; --knob-dot:#9aa7b8;
-  --scrim:rgba(4,7,12,.62); --shadow-deep:rgba(0,0,0,.55);
-  color-scheme:dark;
-}
-body.m-light{
-
-  --bg:#f4f6f8;
-  --surf:#ffffff; --soft:#eef1f5; --line:#e6eaef;
-  --ink:#141821; --dim:#6a7484;
-  --acc:#2f6df6; --on-acc:#ffffff;
-  --acc2:#12a150; --on-acc2:#ffffff;
-  --tile1:#2f6df6; --on-tile1:#ffffff;
-  --tile2:#12a150; --on-tile2:#ffffff;
-  --tile-line:transparent; --tile-soft:rgba(255,255,255,.24);
-  --ok:#12a150; --warn:#c88a04; --on-warn:#ffffff; --bad:#d64550;
-  --r:18px; --sh:0 1px 2px rgba(16,24,40,.05);
-  --top-bg:rgba(244,246,248,.86);
-  --hero-bg:#101014; --hero-ink:#ffffff; --hero-dim:#a8a8b2; --hero-acc:#7aa2ff;
-  --hero-line:#101014; --hero-line2:rgba(255,255,255,.13);
-  --badge-sys-bg:#eef3fd; --badge-sys-fg:#2f6df6;
-  --badge-man-bg:#e8f6ee; --badge-man-fg:#0d7c3f;
-  --btn-bg:#141821; --btn-fg:#ffffff;
-  --knob:#d7dce3; --knob-dot:#ffffff;
-  --scrim:rgba(20,24,33,.4); --shadow-deep:rgba(16,24,40,.22);
-  color-scheme:light;
-}
-body.m-warm{
-
-  --bg:linear-gradient(160deg,#fbf8f4 0%,#f7f3ee 55%,#f4efe8 100%);
-  --surf:#ffffff; --soft:#f5f0e9; --line:#ece5db;
-  --ink:#221d18; --dim:#7d7166;
-  --acc:#c2653a; --on-acc:#ffffff;
-  --acc2:#4b8f5e; --on-acc2:#ffffff;
-  --tile1:#c2653a; --on-tile1:#ffffff;
-  --tile2:#4b8f5e; --on-tile2:#ffffff;
-  --tile-line:transparent; --tile-soft:rgba(255,255,255,.26);
-  --ok:#4b8f5e; --warn:#c08a2e; --on-warn:#ffffff; --bad:#c25a52;
-  --r:22px; --sh:0 2px 10px rgba(120,90,60,.06);
-  --top-bg:rgba(251,248,244,.86);
-  --hero-bg:#2a231d; --hero-ink:#f7f2ec; --hero-dim:#b3a596; --hero-acc:#e8a06f;
-  --hero-line:#2a231d; --hero-line2:rgba(255,255,255,.13);
-  --badge-sys-bg:#f6ece3; --badge-sys-fg:#b0603a;
-  --badge-man-bg:#eaf1e9; --badge-man-fg:#3f7a51;
-  --btn-bg:#c2653a; --btn-fg:#ffffff;
-  --knob:#ded5c8; --knob-dot:#ffffff;
-  --scrim:rgba(34,29,24,.42); --shadow-deep:rgba(120,90,60,.28);
-  color-scheme:light;
-}
-
-body{background:var(--bg);color:var(--ink);
-     background-attachment:fixed}
-
-/* ── Шапка ───────────────────────────────────────────────────────── */
-.top{background:var(--top-bg);border-bottom:1px solid transparent;
-     transition:border-color .2s ease,background .2s ease;
-     backdrop-filter:blur(8px) saturate(140%)}
-body.scrolled .top{border-color:var(--line)}
-.brand-sub{color:var(--dim)}
-.ghost{color:var(--dim);font-weight:600;transition:background .15s ease,color .15s ease}
-.ghost:hover{background:var(--soft);color:var(--ink)}
-.kbd-btn{background:var(--soft);color:var(--dim);font-weight:600}
-.kbd-btn:hover{color:var(--ink)}
-kbd{background:var(--surf);border:1px solid var(--line);color:var(--dim)}
-.health{background:var(--soft);color:var(--ink);font-weight:700}
-
-/* ── Герой ───────────────────────────────────────────────────────── */
-.hero{padding:12px 0 0}
-.hero-in{background:var(--hero-bg);color:var(--hero-ink);border:1px solid var(--hero-line);
-         border-radius:calc(var(--r) + 8px);padding:60px 56px 0;overflow:hidden}
-.hero-txt{max-width:640px;padding-bottom:52px}
-.hero h1{font-size:clamp(2.4rem,5vw,3.9rem);font-weight:800;letter-spacing:-.035em;line-height:1.03}
-.hero .h1-acc{color:var(--hero-acc)}
-.hero p{margin-top:20px;font-size:1.05rem;color:var(--hero-dim);max-width:520px}
-.hero-stats{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--hero-line2)}
-.hs{padding:26px 22px 30px;border-right:1px solid var(--hero-line2);
-    display:flex;flex-direction:column;gap:6px}
-.hs:first-child{padding-left:0}
-.hs:last-child{border-right:0}
-.hs-k{font-size:.74rem;text-transform:uppercase;letter-spacing:.12em;color:var(--hero-dim)}
-.hs-v{font-size:2rem;font-weight:800;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
-/* одна ячейка залита акцентом — «сейчас смотрим сюда» */
-.hs-accent{background:var(--tile1);color:var(--on-tile1);margin:0 -22px -1px 0;padding-right:22px;border-right:0;
-           border-radius:var(--r) var(--r) 0 0}
-.hs-accent .hs-k{color:var(--on-tile1);opacity:.75}
-
-/* ── Карточки ────────────────────────────────────────────────────── */
-.card{background:var(--surf);border:1px solid var(--line);border-radius:var(--r);
-      padding:20px;box-shadow:var(--sh)}
-.block-h .sub{color:var(--dim)}
-.tag{font-size:.68rem;text-transform:uppercase;letter-spacing:.12em;font-weight:700;
-     background:var(--warn);color:var(--on-warn);padding:4px 10px;border-radius:999px}
-.foot{margin-top:16px;font-size:.84rem;color:var(--dim)}
-.note{color:var(--dim)}
-
-/* ── Метрики: плитка залита цветом целиком ───────────────────────── */
-/* Насколько громко залита плитка — тоже свойство настроения:
-   в светлых оно кричит цветом во всю плоскость, в тёмном — приглушённая
-   подложка и акцент в цифрах. Разметка при этом одна и та же. */
-.metric{border-color:var(--tile-line);box-shadow:none}
-#c-cpu{background:var(--tile1);color:var(--on-tile1)}
-#c-ram{background:var(--tile2);color:var(--on-tile2)}
-#c-cpu.warn,#c-ram.warn{background:var(--warn);color:var(--on-warn)}
-#c-cpu.crit,#c-ram.crit{background:var(--bad);color:#fff}
-.m-top{display:flex;align-items:baseline;gap:12px}
-.m-name{font-size:1.25rem;font-weight:750;letter-spacing:-.02em}
-.m-state{font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;
-         background:var(--tile-soft);padding:3px 9px;border-radius:999px}
-.m-val{margin-left:auto;font-size:2.6rem;font-weight:800;letter-spacing:-.04em;line-height:1;
-       font-variant-numeric:tabular-nums}
-.m-sub{opacity:.72;font-size:.86rem;margin-top:4px}
-.track{height:6px;border-radius:999px;background:var(--tile-soft);margin-top:16px;overflow:hidden}
-.track i{display:block;height:100%;background:currentColor;border-radius:999px;
-         transition:width .6s cubic-bezier(.22,1,.36,1)}
-.metric .sp-line{stroke:currentColor}
-.metric .sp-fill{fill:currentColor;opacity:0}
-.metric.seen .sp-fill{opacity:.15}
-.m-hist{font-size:.76rem;opacity:.7;margin-top:6px}
-
-/* ── Кольцо и сервисы ────────────────────────────────────────────── */
-.ring-bg{stroke:var(--line)}
-.ring-fg{stroke:var(--acc)}
-.ring-fg.full{stroke:var(--ok)}
-.ring-mid b{color:var(--ink)}
-.ring-mid span{color:var(--dim)}
-.ring-cap{color:var(--ink);font-weight:600}
-.svc-list{background:var(--surf);border:1px solid var(--line);border-radius:var(--r);
-          padding:10px 6px;box-shadow:var(--sh)}
-.svc-gt{color:var(--dim);padding-left:16px;margin-top:12px}
-.svc{border-radius:calc(var(--r) - 6px);transition:background .14s ease}
+.svc{display:grid;grid-template-columns:40px minmax(0,1.15fr) minmax(0,1.35fr) 165px;
+  align-items:baseline;gap:0 18px;padding:13px 0;border-top:1px solid var(--line);color:inherit}
 .svc:hover{background:var(--soft)}
-.svc-bd span{color:var(--dim)}
-.st.up{background:var(--ok)}
-.st.down{background:var(--bad)}
-.st.wait{background:var(--dim)}
+.svc .n{font-family:'Plex Mono',ui-monospace,monospace;font-size:.72rem;color:var(--dim)}
+.svc .name{display:flex;align-items:baseline;gap:9px;min-width:0}
+.svc .name b{font-weight:500;font-size:1.16rem;letter-spacing:-.01em}
+.svc .name i{font-style:normal;font-size:.95rem}
+.svc .d{font-size:.98rem;color:var(--dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.svc .meta{display:flex;align-items:baseline;justify-content:space-between;gap:10px;
+  font-family:'Plex Mono',ui-monospace,monospace;font-size:.68rem;
+  text-transform:uppercase;letter-spacing:.12em;color:var(--dim)}
+.svc .meta span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* Адрес при нехватке места урезается, слово состояния — никогда:
+   «на ли…» вместо «на линии» выглядит как обрыв связи, а не как вёрстка. */
+.svc .meta span:last-child{flex:none;overflow:visible}
+.st-up{color:var(--ok)}
+.st-down{color:var(--bad)}
 
-/* ── Лента ───────────────────────────────────────────────────────── */
-.feed{display:flex;flex-direction:column;gap:12px}
-.item{background:var(--soft);border-radius:calc(var(--r) - 4px);padding:15px 18px}
-.item p{color:var(--dim);font-size:.95rem}
-.who.sys{background:var(--badge-sys-bg);color:var(--badge-sys-fg)}
-.who.man{background:var(--badge-man-bg);color:var(--badge-man-fg)}
-.when{color:var(--dim);margin-left:auto}
-.feed-msg{background:var(--soft);border-radius:calc(var(--r) - 4px);color:var(--dim)}
-.compose{margin-bottom:14px}
+/* ── Записи ──────────────────────────────────────────────────────────── */
 
-/* ── Формы ───────────────────────────────────────────────────────── */
-.compose input,.compose textarea,.auth input{background:var(--soft);border:1px solid var(--line)}
-.compose input:focus,.compose textarea:focus,.auth input:focus{
-  background:var(--surf);border-color:var(--acc);outline:0}
-.btn{background:var(--btn-bg);color:var(--btn-fg)}
-.btn:hover{filter:brightness(1.12)}
-.auth .btn{width:100%}
-.lbl{color:var(--dim)}
-.msg.on{color:var(--bad)}
-.auth .who b{font-weight:750}
-.auth .who span{color:var(--dim);font-size:.85rem}
-.auth .who .ghost{margin-left:auto;padding:4px 10px}
+.news-two{display:grid;grid-template-columns:1fr 1fr;gap:0 40px}
+.entry{border-top:1px solid var(--line);padding:16px 0}
+.when{display:flex;align-items:baseline;gap:12px;
+  font-family:'Plex Mono',ui-monospace,monospace;font-size:.68rem;
+  text-transform:uppercase;letter-spacing:.16em;color:var(--dim)}
+.entry h3{margin:8px 0 0;font-weight:500;font-size:1.44rem;line-height:1.15;letter-spacing:-.015em}
+.entry p{margin:7px 0 0;font-size:1.04rem;color:var(--dim)}
+.tag-hand{color:var(--acc)}
 
-/* ── Железячка и тумблеры ────────────────────────────────────────── */
-.rig-k{color:var(--dim)}
-.rig .v{color:var(--ink)}
+/* ── Стопка технологий ───────────────────────────────────────────────── */
 
-/* ── Палитра команд ──────────────────────────────────────────────── */
-.pal-scrim{background:var(--scrim)}
-.pal{background:var(--surf);border:1px solid var(--line);border-radius:var(--r);
-     box-shadow:0 24px 60px var(--shadow-deep)}
-.pal input{background:transparent;border-bottom:1px solid var(--line)}
-.pal-i.on{background:var(--soft)}
-.pi-sub{color:var(--dim);margin-left:auto}
-.pal-foot{border-top:1px solid var(--line);color:var(--dim)}
-.pal-none{color:var(--dim)}
+.stack{margin:14px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:9px;
+  font-family:'Plex Mono',ui-monospace,monospace;font-size:.84rem}
+.stack li{display:flex;justify-content:space-between;gap:14px;
+  border-bottom:1px dotted var(--line2);padding-bottom:7px}
+.stack li:last-child{border-bottom:0}
 
-/* ── Подвал ──────────────────────────────────────────────────────── */
-.foot-bar{color:var(--dim);border-top:1px solid var(--line);margin-top:40px}
+/* ── Подвал ──────────────────────────────────────────────────────────── */
 
-@media (max-width:900px){
-  .hero-in{padding:40px 26px 0}
-  .hero-stats{grid-template-columns:1fr 1fr}
-  .hs{border-bottom:1px solid var(--hero-line2);padding:18px 0 20px}
-  .hs:nth-child(2n){border-right:0;padding-left:22px}
-  .hs-accent{margin:0;padding-left:22px;border-radius:0}
+footer{border-top:1px solid var(--ink)}
+.foot{display:flex;justify-content:space-between;align-items:baseline;
+  gap:14px 28px;flex-wrap:wrap;padding-top:18px;padding-bottom:34px;
+  font-family:'Plex Mono',ui-monospace,monospace;font-size:.72rem;color:var(--dim)}
+
+/* ── «Твоя железячка» ─────────────────────────────────────────────────────
+   Подсказка вылезает и по наведению, и по фокусу с клавиатуры: до неё можно
+   дойти табом, не трогая мышь. */
+
+.rig{position:relative;display:inline-flex;align-items:baseline;gap:8px;flex-wrap:wrap;cursor:help}
+.rig .tip{position:absolute;right:0;bottom:calc(100% + 8px);width:min(380px,80vw);
+  background:var(--paper);border:1px solid var(--ink);padding:10px 12px;
+  font-size:.7rem;line-height:1.45;color:var(--dim);text-align:left;text-transform:none;
+  letter-spacing:0;opacity:0;visibility:hidden;transition:opacity .12s;z-index:50}
+.rig:hover .tip,.rig:focus .tip,.rig:focus-within .tip{opacity:1;visibility:visible}
+.rig b{font-weight:400;color:var(--ink)}
+
+/* ── Кнопка настроения ───────────────────────────────────────────────── */
+
+.moodbar{position:fixed;right:22px;bottom:22px;z-index:60;display:flex;align-items:center;
+  gap:10px;background:var(--paper);border:1px solid var(--ink);padding:7px 8px 7px 13px}
+.moodbar button{padding:6px 12px;background:var(--acc);color:var(--on-acc);border:0;cursor:pointer;
+  font-family:'Plex Mono',ui-monospace,monospace;font-size:.62rem;
+  text-transform:uppercase;letter-spacing:.16em}
+.moodbar button.ghost{background:none;border:1px solid var(--line2);color:var(--ink)}
+
+/* ── Узкий экран ─────────────────────────────────────────────────────── */
+
+@media (max-width:1000px){
+  .wrap{padding-left:18px;padding-right:18px}
+  .head-two{grid-template-columns:1fr;gap:24px}
+  .aside{border-left:0;padding-left:0;padding-top:18px;border-top:1px solid var(--line)}
+  nav{gap:13px;font-size:.6rem;letter-spacing:.12em}
+  .head{flex-wrap:wrap;row-gap:8px}
+  .hide-sm{display:none}
+  .moodbar{left:12px;right:12px;bottom:12px;flex-wrap:wrap;row-gap:8px}
+
+  /* Две колонки на узком экране складываются в одну. */
+  .two-eq{grid-template-columns:1fr;gap:24px}
+  .news-two{grid-template-columns:1fr;gap:0}
+
+  /* Строка сервиса разворачивается в два этажа: сверху иконка и имя,
+     ниже описание и адрес с состоянием. Четыре колонки в 420 пикселей
+     не влезают — имя налезает на описание. */
+  .svc{grid-template-columns:26px minmax(0,1fr);row-gap:3px}
+  .svc .d,
+  .svc .meta{grid-column:2}
+  .svc .meta{justify-content:flex-start;gap:12px}
+
+  /* Числа метрик встают друг под другом, а линия становится выше:
+     на узком экране пологая линия в 96 пикселей читается плохо. */
+  .strip{flex-direction:column;align-items:flex-start;gap:8px}
+  .chart svg{height:130px}
+
+  .jrow{grid-template-columns:1fr;row-gap:6px}
+  .jrow .when{flex-direction:row;gap:12px}
 }
 
-.moodbar{position:fixed;right:20px;bottom:20px;z-index:60;display:flex;align-items:center;gap:10px;
-         background:var(--surf);border:1px solid var(--line);border-radius:999px;
-         padding:8px 10px 8px 16px;box-shadow:0 10px 30px var(--shadow-deep)}
-.moodbar .cap{font-size:.78rem;color:var(--dim);white-space:nowrap}
-.moodbar .cap b{color:var(--ink);font-weight:650}
-.mood-btn{display:flex;align-items:center;gap:9px;background:var(--acc);color:var(--on-acc);
-          border-radius:999px;padding:9px 18px;font-weight:650;font-size:.9rem;
-          transition:filter .15s ease,transform .12s ease}
-.mood-btn:hover{filter:brightness(1.08)}
-.mood-btn:active{transform:scale(.97)}
-.mood-btn .dot{width:11px;height:11px;border-radius:50%;background:currentColor;flex:none}
-@media (max-width:560px){
-  .moodbar{right:12px;bottom:12px;padding:6px 8px 6px 12px}
-  .moodbar .cap{display:none}
-}
-
+/* Системную просьбу «поменьше движения» уважаем без оговорок. */
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
-<body class="m-dark">
 
-<a class="skip" href="#feed">К ленте</a>
+<body class="j-warm">
 
-<header class="top">
-  <div class="wrap top-in">
-    <span class="brand"><i class="mark">🍺</i><b>pivasik</b><span class="brand-sub">хаб стенда</span></span>
-    <nav class="top-nav">
-      <button class="ghost" type="button" data-jump="#s-feed">Лента</button>
-      <button class="ghost" type="button" data-jump="#s-cluster">Кластер</button>
-
-      <!-- Выпадающая панель сервисов: открывается наведением, закрывается
-           не сразу — чтобы курсор успел дойти по диагонали. -->
-      <div class="navdrop" id="navdrop">
-        <button class="ghost drop-btn" type="button" id="drop-btn"
-                aria-expanded="false" aria-haspopup="true" aria-controls="drop-panel">
-          Сервисы<span class="chev" aria-hidden="true"></span>
-        </button>
-        <div class="drop-panel" id="drop-panel">
-          <div class="drop-in" id="svc-menu"></div>
-          <div class="drop-foot">
-            <span id="drop-stat">проверяю…</span>
-            <button class="ghost" type="button" data-jump="#s-svc">весь раздел ниже ↓</button>
-          </div>
-        </div>
-      </div>
+<header>
+  <div class="wrap head">
+    <a class="brand" href="/" data-go="home">
+      <i>🍺</i><b>pivasik</b>
+      <span class="caps hide-sm">домашний стенд</span>
+    </a>
+    <nav>
+      <a href="/services" data-go="services">Сервисы</a>
+      <a href="/journal"  data-go="journal">Журнал</a>
+      <a href="/cluster"  data-go="cluster">Кластер</a>
+      <span class="health" id="health"><i></i><span id="healthText">проверяю…</span></span>
+      <a href="#" class="enter" id="enter">Войти</a>
     </nav>
-    <div class="top-right">
-      <button class="kbd-btn" type="button" id="pal-open" title="Поиск по стенду">
-        <span>Поиск</span><kbd>Ctrl</kbd><kbd>K</kbd>
-      </button>
-      <span class="health" id="health" title="сколько сервисов отвечает">
-        <i class="st wait" id="hdot"></i><b id="hcnt">…</b>
-      </span>
+  </div>
 
-      <!-- Вход переехал в шапку: открывается по клику, а не по наведению —
-           форму, из которой можно случайно увести курсор, так не делают. -->
-      <div class="navdrop authdrop" id="authdrop">
-        <button class="ghost drop-btn" type="button" id="auth-btn"
-                aria-expanded="false" aria-haspopup="true" aria-controls="auth-panel">
-          <span id="auth-btn-label">Войти</span><span class="chev" aria-hidden="true"></span>
-        </button>
-        <div class="drop-panel auth-panel auth" id="auth-panel">
-          <div id="auth-guest">
-            <span class="lbl">Вход</span>
-            <form id="login" autocomplete="off">
-              <input type="text" id="user" placeholder="Логин" autocomplete="username" maxlength="64">
-              <input type="password" id="pass" placeholder="Пароль" autocomplete="current-password" maxlength="200">
-              <button class="btn" type="submit">Войти</button>
-            </form>
-            <div class="msg" id="lmsg"></div>
-          </div>
-          <div id="auth-user" class="hidden">
-            <span class="lbl">Ты вошёл</span>
-            <div class="who">
-              <b id="u-name">—</b><span id="u-role">—</span>
-              <button class="ghost" type="button" id="u-quit">выйти</button>
-            </div>
-            <form id="pwd" autocomplete="off">
-              <input type="password" id="p-old" placeholder="Текущий пароль"
-                     maxlength="200" autocomplete="current-password">
-              <input type="password" id="p-new" placeholder="Новый пароль, от 10 знаков"
-                     maxlength="200" autocomplete="new-password">
-              <button class="btn" type="submit">Сменить пароль</button>
-            </form>
-            <button class="ghost" type="button" id="u-revoke">выйти на других устройствах</button>
-            <div class="msg" id="pmsg"></div>
-            <p class="note" id="u-note">Служебные сервисы появились в списке.</p>
-          </div>
-        </div>
-      </div>
-    </div>
+  <!-- Вход выпадающим окошком по клику, а не по наведению: из формы, которую
+       держит курсор, слишком легко выйти рукой на полпути к паролю. -->
+  <div id="authBox" hidden style="border-top:1px solid var(--line);background:var(--paper)">
+    <form class="wrap authform" id="authForm">
+      <label class="caps">логин
+        <input type="text" id="authLogin" autocomplete="username">
+      </label>
+      <label class="caps">пароль
+        <input type="password" id="authPass" autocomplete="current-password">
+      </label>
+      <button type="submit" class="btn">войти</button>
+      <span class="mono" id="authErr" style="font-size:.72rem;color:var(--bad)"></span>
+    </form>
   </div>
 </header>
 
-<div class="hero">
-  <div class="wrap hero-in">
-    <div class="hero-txt">
-      <h1>Стенд, который<br><span class="h1-acc">рассказывает о себе</span></h1>
-      <p>Домашний кластер k3s: что в нём происходит, что живо и на что это тратится.
-         Всё на одной странице, без входа.</p>
-    </div>
-    <div class="hero-stats" id="hero-stats">
-      <div class="hs"><span class="hs-k">процессор</span><span class="hs-v" id="hs-cpu">—</span></div>
-      <div class="hs"><span class="hs-k">память</span><span class="hs-v" id="hs-ram">—</span></div>
-      <div class="hs"><span class="hs-k">сервисы</span><span class="hs-v" id="hs-svc">—</span></div>
-      <div class="hs hs-accent"><span class="hs-k">записей</span><span class="hs-v" id="hs-news">—</span></div>
-    </div>
+<main>
+
+  <!-- ГЛАВНАЯ -->
+  <div data-page="home">
+
+    <section class="sect">
+      <div class="wrap head-two">
+        <div>
+          <span class="caps acc" id="issue">выпуск</span>
+          <h1 style="margin-top:16px">Кластер в комнате, который<br><em>ведёт о себе дневник</em></h1>
+          <p class="lead" style="max-width:560px;font-size:1.14rem">Две ноды k3s под столом, одиннадцать сервисов, вся выкладка через git. Здесь видно, чем он занят прямо сейчас, и записано, что с ним происходило.</p>
+        </div>
+        <div class="aside">
+          <span class="caps">в двух словах</span>
+          <dl class="dl">
+            <dt>ноды</dt><dd>2, обе Ready</dd>
+            <dt>поды</dt><dd>43 running</dd>
+            <dt>сервисы</dt><dd id="sumSvc">—</dd>
+            <dt>записей</dt><dd id="sumNews">—</dd>
+          </dl>
+        </div>
+      </div>
+
+      <!-- График собирается скриптом: один и тот же на четыре места. -->
+      <div class="wrap" id="chartHome"></div>
+    </section>
+
+    <section class="sect">
+      <div class="wrap pad-sect">
+        <div class="h-row">
+          <h2>Что здесь живёт</h2>
+          <a class="caps" href="/services" data-go="services" id="allSvcLink">все адреса →</a>
+        </div>
+        <div id="homeSvc"></div>
+      </div>
+    </section>
+
+    <section class="sect">
+      <div class="wrap pad-sect">
+        <div class="h-row">
+          <h2>Из журнала</h2>
+          <a class="caps" href="/journal" data-go="journal">все записи →</a>
+        </div>
+        <div class="news-two" id="homeNews"></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap two-eq">
+        <div>
+          <h2>Как это собрано</h2>
+          <p style="margin:14px 0 0;font-size:1.08rem;color:var(--dim)">Стенд собран, чтобы разбираться, а не чтобы держать нагрузку: k3s на двух нодах, хранилище на Longhorn с репликами, секреты в git через Sealed Secrets, выкладка через Argo CD. Страницу правишь в одном файле — коммит, и Argo сам перезапускает под.</p>
+          <p style="margin:12px 0 0;font-size:1.08rem;color:var(--dim)">Метрики приходят из Prometheus, логи — в Loki, панели — в Grafana. Ничего из этого не обязано работать в три ночи, и это приятно.</p>
+        </div>
+        <div class="aside">
+          <span class="caps">стопка технологий</span>
+          <ul class="stack">
+            <li><span class="dim">кластер</span><span>k3s · 2 ноды</span></li>
+            <li><span class="dim">выкладка</span><span>Argo CD · kustomize</span></li>
+            <li><span class="dim">хранилище</span><span>Longhorn · NFS-бэкапы</span></li>
+            <li><span class="dim">наблюдение</span><span>Prometheus · Loki · Grafana</span></li>
+            <li><span class="dim">бэкенд хаба</span><span>FastAPI · PostgreSQL</span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
   </div>
-</div>
 
-<main class="wrap page">
-
-  <!-- ─── КЛАСТЕР ────────────────────────────────────────────── -->
-  <section class="block" id="s-cluster">
-    <div class="block-h">
-      <h2>Кластер</h2>
-      <span class="tag" id="m-demo">демо</span>
-    </div>
-
-    <div class="grid-2">
-      <article class="card metric" id="c-cpu">
-        <div class="m-top">
-          <span class="m-name">Процессор</span>
-          <span class="m-state" id="cpu-state">норма</span>
-          <span class="m-at" id="cpu-at"></span>
-          <span class="m-val" id="cpu-val">—</span>
+  <!-- СЕРВИСЫ -->
+  <div data-page="services">
+    <section>
+      <div class="wrap head-two">
+        <div>
+          <span class="caps acc">раздел</span>
+          <h1 style="margin-top:12px;font-size:clamp(2.2rem,4vw,3.4rem)">Сервисы</h1>
+          <p class="lead">«На линии» значит, что по сети что-то ответило — проверка идёт из твоего браузера и не читает ответ. Спрятанная ссылка и закрытая дверь — разные вещи: служебные панели закрыты своими паролями.</p>
         </div>
-        <div class="m-sub" id="cpu-sub">&nbsp;</div>
-        <div class="track"><i id="cpu-bar" style="width:0%"></i></div>
-        <div class="spark-box" id="cpu-box">
-          <svg class="spark" id="cpu-spark" viewBox="0 0 240 48" preserveAspectRatio="none" aria-hidden="true">
-            <polyline class="sp-fill" points=""></polyline>
-            <polyline class="sp-line" points=""></polyline>
-          </svg>
-          <i class="sp-cursor"></i><i class="sp-dot"></i>
+        <div class="aside">
+          <b class="huge" id="svcUp">—</b>
+          <span class="caps" id="svcUpNote">проверяю…</span>
         </div>
-        <div class="m-hist" id="cpu-hist">история копится с открытия вкладки</div>
-      </article>
+      </div>
+      <div class="wrap" style="padding:26px 0 40px">
+        <div id="svcGroups"></div>
+        <p class="note-guest" id="svcGuestNote" hidden></p>
+      </div>
+    </section>
+  </div>
 
-      <article class="card metric" id="c-ram">
-        <div class="m-top">
-          <span class="m-name">Память</span>
-          <span class="m-state" id="ram-state">норма</span>
-          <span class="m-at" id="ram-at"></span>
-          <span class="m-val" id="ram-val">—</span>
+  <!-- ЖУРНАЛ -->
+  <div data-page="journal">
+    <section>
+      <div class="wrap head-two">
+        <div>
+          <span class="caps acc">раздел</span>
+          <h1 style="margin-top:12px;font-size:clamp(2.2rem,4vw,3.4rem)">Журнал</h1>
+          <p class="lead">Пишут двое: кластер сам и я руками. Ярлык слева говорит, кто именно. Текст записи всегда вставляется как текст — разметка в заголовке покажется буквами.</p>
         </div>
-        <div class="m-sub" id="ram-sub">&nbsp;</div>
-        <div class="track"><i id="ram-bar" style="width:0%"></i></div>
-        <div class="spark-box" id="ram-box">
-          <svg class="spark" id="ram-spark" viewBox="0 0 240 48" preserveAspectRatio="none" aria-hidden="true">
-            <polyline class="sp-fill" points=""></polyline>
-            <polyline class="sp-line" points=""></polyline>
-          </svg>
-          <i class="sp-cursor"></i><i class="sp-dot"></i>
+        <div class="aside">
+          <b class="huge" id="newsCount">—</b>
+          <span class="caps" id="newsNote"></span>
         </div>
-        <div class="m-hist" id="ram-hist">история копится с открытия вкладки</div>
-      </article>
-    </div>
+      </div>
+      <div class="wrap" style="padding:26px 0 40px">
 
-    <p class="foot" id="m-foot">Источник — Prometheus.</p>
-  </section>
-
-  <!-- ─── СЕРВИСЫ ────────────────────────────────────────────── -->
-  <section class="block" id="s-svc">
-    <div class="block-h">
-      <h2>Сервисы</h2>
-      <button class="ghost" type="button" id="svc-refresh">обновить</button>
-    </div>
-
-    <div class="svc-wrap">
-      <aside class="card ring-card">
-        <!-- Обёртка нужна, чтобы число вставало по центру кольца, а не по
-             центру карточки: у карточки свои внутренние отступы. -->
-        <div class="ring-box">
-          <svg class="ring" viewBox="0 0 128 128" aria-hidden="true">
-            <circle class="ring-bg" cx="64" cy="64" r="54"></circle>
-            <circle class="ring-fg" id="ring" cx="64" cy="64" r="54"></circle>
-          </svg>
-          <div class="ring-mid">
-            <b id="ring-num">—</b>
-            <span id="ring-tot">из —</span>
-          </div>
-        </div>
-        <p class="ring-cap" id="ring-cap">проверяю…</p>
-        <p class="note">Зелёный — «сервис на линии»: по сети что-то ответило.
-           Проверка идёт из твоего браузера и не читает ответ.</p>
-      </aside>
-      <div class="svc-list" id="svc-list"></div>
-    </div>
-  </section>
-
-  <!-- ─── ЛЕНТА ──────────────────────────────────────────────── -->
-  <section class="block" id="s-feed">
-    <div class="block-h">
-      <h2>Что нового</h2>
-    </div>
-
-    <div class="feed-wrap">
-      <div class="feed-main">
-        <form class="card compose hidden" id="compose" data-keep>
-          <span class="lbl">Новая запись</span>
-          <input id="c-title" maxlength="200" placeholder="Заголовок" autocomplete="off">
-          <textarea id="c-body" maxlength="4000" placeholder="Что произошло"></textarea>
-          <div class="row">
-            <button class="btn" type="submit" id="c-send">Опубликовать</button>
-            <span class="hint" id="c-hint">Запись получит ярлык «вручную» и твоё имя.</span>
+        <!-- Форму видит только админ. Скрыта не для защиты — писать в ленту
+             всё равно разрешает бэкенд, — а чтобы не мозолила глаза. -->
+        <form class="form" id="newsForm" hidden>
+          <span class="caps" style="display:block;margin-bottom:12px">новая запись · видит только админ</span>
+          <input type="text" id="newsTitle" placeholder="Заголовок" maxlength="200">
+          <textarea id="newsBody" placeholder="Что произошло" maxlength="4000"></textarea>
+          <div class="foot-row">
+            <button type="submit" class="btn">опубликовать</button>
+            <span class="mono dim" style="font-size:.68rem">запись получит ярлык «вручную» и твоё имя</span>
           </div>
         </form>
-        <div class="feed" id="feed"><div class="feed-msg">Загружаю ленту…</div></div>
-      </div>
-    </div>
-  </section>
 
+        <div id="newsFeed"></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- КЛАСТЕР -->
+  <div data-page="cluster">
+    <section>
+      <div class="wrap head-two">
+        <div>
+          <span class="caps acc">раздел · источник Prometheus</span>
+          <h1 style="margin-top:12px;font-size:clamp(2.2rem,4vw,3.4rem)">Кластер</h1>
+          <p class="lead">Замер каждые 15 секунд, шестьдесят точек, история копится в этой вкладке. Веди курсором по линии — числа и подписи переключатся на тот момент.</p>
+        </div>
+        <div class="aside">
+          <!-- Эти четыре строки пока текст: /api/metrics отдаёт только
+               процессор и память. Либо расширять ручку, либо убрать. -->
+          <dl class="dl" style="margin-top:0">
+            <dt>ноды</dt><dd>tent · main, обе Ready</dd>
+            <dt>поды</dt><dd>43 running, 0 pending</dd>
+            <dt>хранилище</dt><dd>Longhorn, 61% из 220 ГБ</dd>
+            <dt>бэкапы</dt><dd>NFS, последний в 04:00</dd>
+          </dl>
+        </div>
+      </div>
+      <div class="wrap" style="padding:30px 0 40px">
+        <div id="chartGuest"></div>
+        <p class="note-guest" id="clusterGuestNote" hidden>гостю показана сводная линия. после входа — раздельные графики по процессору и памяти.</p>
+        <div id="chartCpu"></div>
+        <div id="chartRam"></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- НЕ НАЙДЕНО -->
+  <div data-page="404">
+    <section>
+      <div class="wrap" style="padding-top:44px">
+        <span class="caps acc">404</span>
+        <h1 style="margin-top:12px;font-size:clamp(2.2rem,4vw,3.4rem)">Такой страницы нет</h1>
+        <p class="lead">Адрес не совпал ни с одним разделом. На стенде их четыре: главная, сервисы, журнал и кластер.</p>
+        <p style="margin-top:20px"><a class="caps acc" href="/" data-go="home">← на главную</a></p>
+      </div>
+      <div class="wrap" style="padding-bottom:60px"></div>
+    </section>
+  </div>
 
 </main>
 
-<!-- Железячка живёт в подвале одной строкой: она не про стенд, а про гостя,
-     и целого раздела ради трёх значений не заслуживает. -->
-<footer class="foot-bar"><div class="wrap">
-  <span>pivasik.org — портал домашнего стенда. k3s, две ноды, GitOps через Argo CD.</span>
-  <span class="rig" id="rig" tabindex="0"
-        aria-describedby="rig-note" title="Считается в твоей вкладке и никуда не отправляется">
-    <span class="rig-k">твоя железячка</span>
-    <span class="v" id="r-cpu">…</span><i>·</i>
-    <span class="v" id="r-gpu">…</span><i>·</i>
-    <span class="v" id="r-scr">…</span>
-    <span class="rig-note" id="rig-note" role="note">На сервер не уходит ничего. Числа рождаются
-      в твоей вкладке, там же и остаются — это метрика для тебя, а не про тебя. Модель процессора
-      браузер не отдаёт принципиально: по ней слишком легко опознать человека.</span>
-  </span>
-</div></footer>
-
-<!-- ─── ПАЛИТРА КОМАНД ───────────────────────────────────────── -->
-<div class="pal-scrim" id="pal-scrim"></div>
-<div class="pal" id="pal" role="dialog" aria-modal="true" aria-label="Поиск по стенду">
-  <input id="pal-input" placeholder="Куда идём? Начни печатать…" autocomplete="off">
-  <div class="pal-list" id="pal-list"></div>
-  <div class="pal-foot"><kbd>↑</kbd><kbd>↓</kbd> выбрать · <kbd>Enter</kbd> открыть · <kbd>Esc</kbd> закрыть</div>
-</div>
+<footer>
+  <div class="wrap foot">
+    <span>pivasik.org · портал домашнего стенда · k3s, две ноды, GitOps через Argo CD</span>
+    <span class="rig hide-sm" id="rig" tabindex="0">
+      <span>твоя железячка</span>
+      <span id="rigFacts" class="dim">считаю…</span>
+      <span class="tip">всё считается в твоей вкладке и никуда не отправляется. модель процессора браузер не выдаёт принципиально — по ней слишком легко опознать человека, поэтому видны только разрядность и число потоков.</span>
+    </span>
+  </div>
+</footer>
 
 <div class="moodbar">
-  <span class="cap">настроение<br><b id="mood-name">Мягкий тёмный</b></span>
-  <button class="mood-btn" type="button" id="mood-btn" title="Следующее настроение">
-    <span class="dot"></span><span>Сменить цвет</span>
-  </button>
+  <span class="caps">настроение <b id="moodName" style="color:var(--ink);font-weight:500">бумага</b></span>
+  <button type="button" id="moodBtn">сменить · M</button>
 </div>
 
 <script>
-/* ══════════════════════════════════════════════════════════════════════
-   Список сервисов — единственное место, где он записан.
-   probe задаёт отдельный адрес проверки: Cockpit режет проверку корня
-   заголовком Cross-Origin-Resource-Policy, а /ping отвечает без него.
-   ══════════════════════════════════════════════════════════════════════ */
-const SERVICES = [
-  { g:"Инфраструктура", ic:"🚀", name:"Argo CD",        url:"https://argo.pivasik.org",     d:"GitOps — весь стенд из git",        infra:true },
-  { g:"Инфраструктура", ic:"💾", name:"Longhorn",       url:"https://longhorn.pivasik.org", d:"Хранилище, реплики на двух нодах",  infra:true },
-  { g:"Инфраструктура", ic:"📊", name:"Grafana",        url:"https://grafana.pivasik.org",  d:"Метрики и логи — Prometheus, Loki", infra:true },
-  { g:"Инфраструктура", ic:"🧭", name:"Headlamp",       url:"https://hl.pivasik.org",       d:"Панель кластера",                   infra:true },
-  { g:"Инфраструктура", ic:"🗄️", name:"Adminer",        url:"https://db.pivasik.org",       d:"PostgreSQL — база стенда",          infra:true },
-  { g:"Инфраструктура", ic:"🧪", name:"gitops-demo",    url:"https://gitops.pivasik.org",   d:"Песочница GitOps",                  infra:true },
-  { g:"Инфраструктура", ic:"🖥️", name:"Cockpit · нода", url:"https://tent.pivasik.org",     d:"docker-tent, 10.0.2.30",            infra:true, probe:"https://tent.pivasik.org/ping" },
-  { g:"Инфраструктура", ic:"🛡️", name:"Cockpit · шлюз", url:"https://main.pivasik.org",     d:"main-server — BIND, nginx, nftables", infra:true, probe:"https://main.pivasik.org/ping" },
-  { g:"Сайты", ic:"🎮", name:"Игровой сервер",       url:"https://game.pivasik.org", d:"Сборки, вход, правила" },
-  { g:"Сайты", ic:"☕", name:"Кофейня «Обжарка»",     url:"https://cafe.pivasik.org", d:"Меню, часы работы, контакты" },
-  { g:"Сайты", ic:"🍺", name:"Старый хаб",           url:"https://hub.pivasik.org",  d:"Ночная сцена с дождём — оставили в истории" }
+"use strict";
+
+/* ── Настроение ───────────────────────────────────────────────────────────
+   Три штуки по кругу. Выбор запоминается, но обращение к хранилищу обёрнуто
+   в try: в приватном окне доступ к нему бросает исключение, и без обёртки
+   на этом падала бы вся страница целиком. */
+
+var MOODS = [
+  { cls:"j-warm",  name:"бумага"  },
+  { cls:"j-dark",  name:"вечер"   },
+  { cls:"j-light", name:"светлый" }
 ];
 
-const $  = id => document.getElementById(id);
-const OFFLINE = location.protocol === "file:";   // открыто двойным кликом
+function readMood(){
+  try { return Math.max(0, MOODS.findIndex(function(m){ return m.cls === localStorage.getItem("mood"); })); }
+  catch (e) { return 0; }
+}
+var mood = readMood();
 
-/* Настройки вида. Пробуем запомнить в браузере; если хранилище закрыто —
-   молча живём в памяти, чтобы страница не падала. */
-const store = (() => {
-  try { localStorage.setItem("_t","1"); localStorage.removeItem("_t"); return localStorage; }
-  catch(e){ const m={}; return { getItem:k=>k in m?m[k]:null, setItem:(k,v)=>{m[k]=String(v)} }; }
-})();
+function applyMood(){
+  document.body.className = MOODS[mood].cls;
+  document.getElementById("moodName").textContent = MOODS[mood].name;
+  try { localStorage.setItem("mood", MOODS[mood].cls); } catch (e) {}
+}
+function cycleMood(){ mood = (mood + 1) % MOODS.length; applyMood(); }
 
-/* ── Плавный переход к разделу ───────────────────────────────────── */
-document.querySelectorAll("[data-jump]").forEach(b => {
-  b.addEventListener("click", () => {
-    const el = document.querySelector(b.dataset.jump);
-    if (el) el.scrollIntoView({ behavior:"smooth", block:"start" });
-  });
+document.getElementById("moodBtn").addEventListener("click", cycleMood);
+window.addEventListener("keydown", function(e){
+  if (e.ctrlKey || e.metaKey || e.altKey) return;
+  var t = e.target.tagName;
+  if (t === "INPUT" || t === "TEXTAREA") return;      /* в поле ввода буква M — это буква M */
+  var k = e.key.toLowerCase();
+  if (k === "m" || k === "ь") cycleMood();
+});
+applyMood();
+
+/* ── Разделы и адреса ─────────────────────────────────────────────────────
+   Файл один, а адреса настоящие: /, /services, /journal, /cluster. Ссылку
+   можно отправить, закладку поставить, «назад» работает. Держится это на
+   history.pushState плюс правиле nginx «неизвестный путь → index.html»,
+   которое на стенде уже стоит.
+
+   Двойной клик по файлу — протокол file:, и pushState там запрещён
+   браузером. В этом случае молча переходим на адреса через решётку
+   (#/services): проверять правки локально можно ровно так же. */
+
+var PAGES = ["home", "services", "journal", "cluster"];
+var PATH  = { home:"/", services:"/services", journal:"/journal", cluster:"/cluster" };
+var local = location.protocol === "file:";
+
+function pageFromUrl(){
+  var p;
+  if (local) {
+    p = (location.hash || "#/").slice(2);
+  } else {
+    p = location.pathname.replace(/^\/|\/$/g, "");
+  }
+  if (p === "") return "home";
+  return PAGES.indexOf(p) === -1 ? "404" : p;
+}
+
+function show(page){
+  var list = document.querySelectorAll("[data-page]");
+  for (var i = 0; i < list.length; i++) {
+    list[i].classList.toggle("on", list[i].getAttribute("data-page") === page);
+  }
+  var links = document.querySelectorAll("nav a[data-go]");
+  for (var j = 0; j < links.length; j++) {
+    links[j].classList.toggle("on", links[j].getAttribute("data-go") === page);
+  }
+  document.title = page === "home" ? "pivasik — домашний стенд"
+    : ({ services:"Сервисы", journal:"Журнал", cluster:"Кластер", "404":"Страницы нет" }[page]) + " · pivasik";
+}
+
+function go(page, push){
+  if (push) {
+    var url = local ? "#/" + (page === "home" ? "" : page) : PATH[page];
+    history.pushState({ page:page }, "", url);
+  }
+  show(page);
+  window.scrollTo(0, 0);
+}
+
+/* Один слушатель на весь документ вместо слушателя на каждой ссылке:
+   ссылки в разделах ещё не написаны, а работать они будут сразу. */
+document.addEventListener("click", function(e){
+  var a = e.target.closest ? e.target.closest("a[data-go]") : null;
+  if (!a) return;
+  e.preventDefault();
+  go(a.getAttribute("data-go"), true);
 });
 
-/* ══════════════════════════════════════════════════════════════════════
-   Плитки сервисов + кольцо «сколько отвечает»
-   ══════════════════════════════════════════════════════════════════════ */
-let ME = { login:"", role:"guest" };
-let AUTHDROP = null;   // панель входа в шапке — создаётся ниже, здесь только имя
+window.addEventListener("popstate", function(){ show(pageFromUrl()); });
+if (local) window.addEventListener("hashchange", function(){ show(pageFromUrl()); });
 
-/* Один и тот же список рисуется в двух местах — в разделе на странице и
-   в выпадающей панели шапки. Разметка общая, различает их только класс
-   на обёртке. */
-function svcMarkup(list){
-  const groups = [...new Set(list.map(s => s.g))];
-  return groups.map(g =>
-    '<div class="svc-g"><span class="svc-gt">' + g + '</span>' +
-    list.filter(s => s.g === g).map(s =>
-      '<a class="svc" href="' + s.url + '" data-url="' + (s.probe || s.url) + '">' +
-        '<span class="svc-ic">' + s.ic + '</span>' +
-        '<span class="svc-bd"><b>' + s.name + '</b><span>' + s.d + '</span></span>' +
-        '<i class="st wait"></i>' +
-      '</a>').join("") + '</div>').join("");
-}
+show(pageFromUrl());
 
-function renderServices(){
-  const list = SERVICES.filter(s => !(s.infra && ME.role === "guest"));
-  const html = svcMarkup(list);
-  $("svc-list").innerHTML = html;
-  $("svc-menu").innerHTML = html;
-  ping();
-}
+/* ── Данные ───────────────────────────────────────────────────────────────
+   Шаг 2 живёт на демо-данных, как макет. Важно другое: страница берёт их из
+   переменных, а не из разметки. На шаге 4 те же переменные наполнит ответ
+   бэкенда, и ни одну строку отрисовки править не придётся.
 
-const RING_LEN = 2 * Math.PI * 54;
-(function(){ const r = $("ring"); r.style.strokeDasharray = RING_LEN; r.style.strokeDashoffset = RING_LEN; })();
+   probe — отдельный адрес пробы. Он уже здесь, хотя пробы появятся шагом 4:
+   у Cockpit проверка корня режется заголовком Cross-Origin-Resource-Policy,
+   поэтому ему нужен /ping. Это же поле потом станет колонкой в таблице. */
 
-let pinging = false;
-function ping(){
-  if (pinging) return;
-  pinging = true;
-  /* Один и тот же сервис теперь стоит в двух местах. Группируем узлы по
-     адресу, чтобы опросить его один раз, а покрасить обе точки —
-     иначе на каждую проверку уходило бы вдвое больше запросов. */
-  const byUrl = new Map();
-  document.querySelectorAll(".svc").forEach(n => {
-    n.querySelector(".st").className = "st wait";
-    const u = n.dataset.url;
-    if (!byUrl.has(u)) byUrl.set(u, []);
-    byUrl.get(u).push(n);
+var SITES = [
+  { ic:"🎮", name:"Игровой сервер",     host:"game", d:"Сборки, вход, правила" },
+  { ic:"☕", name:"Кофейня «Обжарка»",  host:"cafe", d:"Меню, часы работы, контакты" },
+  { ic:"🍺", name:"Старый хаб",          host:"hub",  d:"Ночная сцена с дождём — оставили в истории" }
+];
+
+var INFRA = [
+  { ic:"🚀", name:"Argo CD",         host:"argo",     d:"GitOps — весь стенд из git" },
+  { ic:"💾", name:"Longhorn",        host:"longhorn", d:"Хранилище, реплики на двух нодах" },
+  { ic:"📊", name:"Grafana",         host:"grafana",  d:"Метрики и логи — Prometheus, Loki" },
+  { ic:"🧭", name:"Headlamp",        host:"hl",       d:"Панель кластера" },
+  { ic:"🗄️", name:"Adminer",         host:"db",       d:"PostgreSQL — база стенда" },
+  { ic:"🧪", name:"gitops-demo",     host:"gitops",   d:"Песочница GitOps" },
+  { ic:"🖥️", name:"Cockpit · нода",  host:"tent",     d:"docker-tent, 10.0.2.30", probe:"/ping" },
+  { ic:"🛡️", name:"Cockpit · шлюз",  host:"main",     d:"main-server — BIND, nginx, nftables", probe:"/ping" }
+];
+
+var NEWS = [
+  { at:"15.08 · 21:40", src:"system", title:"Бэкапы Longhorn уехали на NFS", body:"Снимки томов складываются на сетевую шару, расписание — каждую ночь в четыре. Первое восстановление проверено вручную." },
+  { at:"12.08 · 18:05", src:"manual", title:"Вторая нода в кластере", body:"docker-tent присоединился к k3s, тома переехали на Longhorn с репликами. Теперь одна выключенная машина не роняет стенд целиком." },
+  { at:"09.08 · 11:20", src:"system", title:"Свой реестр образов", body:"Образы хаба собираются и лежат рядом с кластером — вытягивать их из интернета больше не нужно." },
+  { at:"07.08 · 16:00", src:"manual", title:"Секреты живут в git", body:"Sealed Secrets: в репозиторий попадает только зашифрованный вид, расшифровать может лишь контроллер в кластере." },
+  { at:"05.08 · 12:00", src:"manual", title:"Первая запись руками", body:"Эта строка написана из-под учётки администратора, а не кластером. Разницу видно по ярлыку слева." },
+  { at:"05.08 · 09:00", src:"system", title:"Хаб развёрнут в кластере", body:"Бэкенд на FastAPI, база в PostgreSQL, образ собран и лежит в своём реестре." }
+];
+
+var me = { login:"", role:"guest" };
+
+/* Что ответила проба по каждому адресу: true, false или ничего, если ещё
+   не спрашивали. Ключ — полный адрес, потому что один сервис может быть
+   нарисован дважды (в витрине на главной и в списке раздела), а спросить
+   его надо один раз. */
+var probeState = {};
+
+function visibleServices(){
+  /* Видимость — свойство группы, а не сервиса: гостю отдаём «Сайты»,
+     вошедшему ещё и «Инфраструктуру». Отдельного флажка у каждой записи
+     нет намеренно — одно решение на группу вместо одиннадцати. */
+  var list = SITES.map(function(s){ return Object.assign({ group:"sites" }, s); });
+  if (me.role !== "guest") {
+    list = list.concat(INFRA.map(function(s){ return Object.assign({ group:"infra" }, s); }));
+  }
+  return list.map(function(s, i){
+    /* Полный адрес считаем один раз: он же ключ в probeState. Раньше запись
+       шла по «game.pivasik.org», а чтение по «game», и состояние навсегда
+       оставалось «проверяю». */
+    var full = s.host + ".pivasik.org";
+    return {
+      ic:s.ic, name:s.name, d:s.d, group:s.group, probe:s.probe,
+      /* В строке показываем поддомен: суффикс у всех одиннадцати один и тот
+         же, одиннадцать раз «.pivasik.org» — шум, который к тому же не влезал
+         в колонку и обрывался многоточием. Полный адрес остаётся в ссылке и
+         во всплывающей подсказке. */
+      sub:s.host,
+      host:full,
+      url:"https://" + full,
+      n:String(i + 1).length < 2 ? "0" + (i + 1) : String(i + 1),
+      /* Три состояния, а не два: пока проба не вернулась, честнее показать
+         «проверяю», чем зелёный кружок, который может оказаться ложью. */
+      state: DEMO ? "up"
+           : probeState[full] === undefined ? "wait"
+           : probeState[full] ? "up" : "down"
+    };
   });
-  $("hdot").className = "st wait"; $("hcnt").textContent = "…";
-  $("ring-cap").textContent = "проверяю…";
-  $("drop-stat").textContent = "проверяю…";
-
-  const hit = (url, method) => {
-    const ac = new AbortController();
-    const t = setTimeout(() => ac.abort(), 7000);
-    return fetch(url + (url.includes("?") ? "&" : "?") + "_ping=" + Date.now(),
-      { method, mode:"no-cors", cache:"no-store", credentials:"omit", signal:ac.signal })
-      .then(() => true, () => false).finally(() => clearTimeout(t));
-  };
-  const probe = u => hit(u, "HEAD").then(ok => ok || hit(u, "GET"));
-
-  Promise.all([...byUrl.entries()].map(([url, nodes]) => probe(url).then(ok => {
-    const when = new Date().toLocaleTimeString("ru-RU");
-    nodes.forEach(n => {
-      n.querySelector(".st").className = "st " + (ok ? "up" : "down");
-      n.title = (ok ? "отвечает" : "не отвечает") + " · проверено " + when;
-    });
-    return ok;
-  }))).then(res => {
-    const up = res.filter(Boolean).length, total = res.length;
-    const at = new Date().toLocaleTimeString("ru-RU",{hour:"2-digit",minute:"2-digit"});
-    $("hcnt").textContent = up + "/" + total;
-    $("drop-stat").textContent = (up === total ? "все отвечают" : up + " из " + total + " отвечают") + " · " + at;
-    $("hdot").className = "st " + (up === total ? "up" : up === 0 ? "down" : "wait");
-    $("hs-svc").textContent = up + "/" + total;
-    $("ring-num").textContent = up;
-    $("ring-tot").textContent = "из " + total;
-    $("ring").style.strokeDashoffset = RING_LEN * (1 - (total ? up / total : 0));
-    $("ring").classList.toggle("full", up === total && total > 0);
-    $("ring-cap").textContent = up === total
-      ? "все отвечают · " + new Date().toLocaleTimeString("ru-RU",{hour:"2-digit",minute:"2-digit"})
-      : up + " из " + total + " отвечают · " + new Date().toLocaleTimeString("ru-RU",{hour:"2-digit",minute:"2-digit"});
-  }).finally(() => { pinging = false; });
-}
-$("svc-refresh").addEventListener("click", ping);
-setInterval(ping, 60000);
-document.addEventListener("visibilitychange", () => { if (!document.hidden) ping(); });
-
-/* ══════════════════════════════════════════════════════════════════════
-   Метрики кластера и спарклайны.
-   Бэкенд историю не отдаёт — копим её сами в этой вкладке.
-   ══════════════════════════════════════════════════════════════════════ */
-const HIST = 60;                       // точек в линии
-const SPW = 240, SPH = 48;             // система координат линии
-/* Каждая точка помнит не только число, но и время с расшифровкой —
-   без этого при наведении нечего было бы показать. */
-const hist = { cpu: [], ram: [] };
-const probing = { cpu:false, ram:false };   // курсор стоит на линии
-
-function state(p){
-  if (p >= 90) return { cls:"crit", word:"предел"   };
-  if (p >= 70) return { cls:"warn", word:"нагрузка" };
-  return              { cls:"ok",   word:"норма"    };
 }
 
-/* Меняем ТОЛЬКО класс состояния. Раньше здесь переписывался весь
-   className, и вместе с ним стирался «seen» — тот самый класс, которым
-   секция проявляется после появления на экране. Наблюдатель к тому
-   времени уже отцепился, возвращать «seen» было некому, и раз в 15 секунд,
-   на очередном замере, плитки просто гасли до прозрачности. */
-function setState(key, cls){
-  const el = $("c-" + key);
-  el.classList.remove("ok", "warn", "crit");
-  el.classList.add(cls);
+/* ── Склонение числительных ───────────────────────────────────────────────
+   «все 3 адресов» — та самая мелочь, из-за которой страница выглядит
+   машинной. Правило русского языка: смотрим на последние две цифры. */
+
+function plural(n, one, few, many){
+  var a = Math.abs(n) % 100, b = a % 10;
+  if (a > 10 && a < 20) return many;
+  if (b > 1 && b < 5)  return few;
+  if (b === 1)         return one;
+  return many;
 }
 
-/* Масштаб по самим данным, а не по 0…100: иначе линия ложится в ниточку
-   и не показывает ровно того, ради чего её рисуют — формы. Поля сверху
-   и снизу, чтобы пики не липли к краю. */
-function geom(vals){
-  const mn = Math.min(...vals), mx = Math.max(...vals);
-  const pad = Math.max(1.5, (mx - mn) * 0.35);
-  const lo = mn - pad, hi = mx + pad;
+/* ── История метрик ───────────────────────────────────────────────────────
+   Шестьдесят точек с шагом 15 секунд — четверть часа. Каждая точка помнит
+   не только процент, но и расшифровку со временем: под курсором нужно
+   показать, что было в тот момент, а не только «сколько». */
+
+var HIST = 60, SPW = 1000, SPH = 96;
+
+function demoHist(){
+  var cpu = [], ram = [], now = Date.now();
+  for (var t = 1; t <= HIST; t++){
+    var c = 31 + Math.sin(t / 3) * 9 + Math.sin(t / 1.7) * 4;
+    var r = 68 + Math.sin(t / 5) * 6;
+    var at = new Date(now - (HIST - t) * 15000);
+    cpu.push({ v:c, sub:(c * 0.06).toFixed(2) + " из 6 ядер", t:at });
+    ram.push({ v:r, sub:(r * 0.155).toFixed(1) + " из 15.5 ГБ", t:at });
+  }
+  return { cpu:cpu, ram:ram };
+}
+
+/* Открыт с диска — запросов к бэкенду нет, показываем демо. Открыт по http —
+   история начинается пустой и наполняется ответами /api/metrics. */
+var DEMO = local;
+var hist = DEMO ? demoHist() : { cpu:[], ram:[] };
+
+/* Линия рисуется не от нуля, а по своему диапазону с запасом в пятую часть:
+   загрузка процессора гуляет в узком коридоре, и от нуля это была бы
+   прямая. Запас нужен, чтобы верхний и нижний всплески не липли к краям. */
+
+function geom(vals, h){
+  var mn = Math.min.apply(null, vals), mx = Math.max.apply(null, vals);
+  if (mx - mn < 1){ mn -= 1; mx += 1; }
+  var pad = (mx - mn) * 0.2;
+  mn -= pad; mx += pad;
+  /* Шаг по горизонтали считается от числа набранных точек, а не от
+     шестидесяти: сразу после открытия вкладки их две-три, и линия всё равно
+     занимает всю ширину — конец линии остаётся «сейчас». */
+  var step = SPW / Math.max(1, vals.length - 1);
   return {
-    x: i => vals.length === 1 ? SPW : (i / (HIST - 1)) * SPW,
-    y: v => SPH - 2 - ((v - lo) / (hi - lo || 1)) * (SPH - 4)
+    x: function(i){ return i * step; },
+    y: function(v){ return h - 4 - ((v - mn) / (mx - mn)) * (h - 12); }
   };
 }
 
-function spark(id, vals){
-  const svg = $(id);
-  if (!vals.length) return;
-  const g = geom(vals);
-  const pts = vals.map((v,i) => g.x(i).toFixed(1) + "," + g.y(v).toFixed(1)).join(" ");
-  svg.querySelector(".sp-line").setAttribute("points", pts);
-  svg.querySelector(".sp-fill").setAttribute("points",
-    "0," + SPH + " " + pts + " " + g.x(vals.length-1).toFixed(1) + "," + SPH);
+function points(arr, g){
+  return arr.map(function(q, i){ return g.x(i).toFixed(1) + "," + g.y(q.v).toFixed(1); }).join(" ");
 }
 
-/* ── Чтение линии курсором ────────────────────────────────────────
-   Наводишь — видно, сколько было в ту минуту. Уводишь — число
-   возвращается к последнему замеру, то есть к «сейчас». */
-const hhmm = d => d.toLocaleTimeString("ru-RU",{hour:"2-digit",minute:"2-digit"});
+/* ── График как деталь ────────────────────────────────────────────────────
+   Линия нужна в четырёх местах: на главной, гостю в «Кластере» и там же
+   вошедшему — раздельно по процессору и памяти. Поэтому не четыре копии
+   разметки, а одна функция: получает пустой div и описание строк, сама
+   собирает вёрстку и возвращает объект с методом draw.
 
-/* Под курсором плитка целиком описывает выбранный момент: число, расшифровка,
-   полоса и слово состояния. Если оставить полосу от «сейчас», получится
-   плитка, половина которой врёт. */
-function applyPoint(key, p){
-  const s = state(p.v);
-  setState(key, s.cls);
-  $(key + "-state").textContent = s.word;
-  $(key + "-val").textContent = Math.round(p.v) + "%";
-  $(key + "-sub").textContent = p.sub;
-  $(key + "-bar").style.width = Math.max(0, Math.min(100, p.v)) + "%";
-}
+   Курсор у каждого графика свой: они независимы и друг о друге не знают. */
 
-function showPoint(key, i){
-  const a = hist[key], p = a[i];
-  if (!p) return;
-  probing[key] = true;
-  $("c-" + key).classList.add("probing");
-  applyPoint(key, p);
-  $(key + "-at").textContent = "в " + hhmm(p.t);
+var SVGNS = "http://www.w3.org/2000/svg";
+var TONE = {
+  acc:   { line:"ln-cpu", fill:"fl-cpu", dot:"dot-cpu" },
+  ink:   { line:"ln-ink", fill:"fl-ram", dot:"dot-ram" },
+  faint: { line:"ln-ram", fill:null,     dot:"dot-ram" }
+};
 
-  const g = geom(a.map(q => q.v));
-  const box = $(key + "-box");
-  box.querySelector(".sp-cursor").style.left = (g.x(i) / SPW * 100) + "%";
-  const dot = box.querySelector(".sp-dot");
-  dot.style.left = (g.x(i) / SPW * 100) + "%";
-  dot.style.top  = (g.y(p.v) / SPH * 100) + "%";
-}
+function word(v){ return v >= 90 ? "предел" : v >= 75 ? "нагрузка" : "норма"; }
 
-function clearPoint(key){
-  probing[key] = false;
-  $("c-" + key).classList.remove("probing");
-  $(key + "-at").textContent = "";
-  // последняя точка и есть «сейчас» — возвращаемся к ней
-  const a = hist[key], last = a[a.length - 1];
-  if (last) applyPoint(key, last);
-}
+function makeChart(host, cfg){
+  var h = cfg.height || SPH;
+  /* Класс ДОБАВЛЯЕМ, а не переписываем: на главной этот же div несёт класс
+     .wrap, который держит колонку в 1120 пикселей. Присваивание className
+     стёрло бы его, и график расползся бы во всю ширину окна. Ровно на этом
+     уже обжигались на прежней странице — там вместе с состоянием стирался
+     класс, которым секция проявляется. */
+  host.classList.add("chartbox");
+  host.textContent = "";
+  if (cfg.top) host.style.borderTop = "1px solid var(--line)";
 
-["cpu","ram"].forEach(key => {
-  const box = $(key + "-box");
-  box.addEventListener("pointermove", e => {
-    const a = hist[key];
-    if (!a.length) return;
-    const r = box.getBoundingClientRect();
-    const frac = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
-    // точки стоят по сетке из HIST мест, даже когда их набралось меньше
-    const i = Math.max(0, Math.min(a.length - 1, Math.round(frac * (HIST - 1))));
-    showPoint(key, i);
+  var strip = document.createElement("div");
+  strip.className = "strip";
+  var at = document.createElement("span");
+  at.className = "caps";
+  strip.append(at);
+
+  var rows = cfg.rows.map(function(spec){
+    var pair = document.createElement("span");
+    pair.className = "pair";
+    var num = document.createElement("b");
+    num.className = "big" + (spec.tone === "acc" ? " acc" : "") + (cfg.tall ? " tall" : "");
+    var sub = document.createElement("span");
+    sub.className = "sub";
+    pair.append(num, sub);
+    strip.append(pair);
+    return { spec:spec, num:num, sub:sub };
   });
-  box.addEventListener("pointerleave", () => clearPoint(key));
-  box.addEventListener("pointercancel", () => clearPoint(key));
-});
 
-function draw(key, pct, sub){
-  $("hs-" + key).textContent = Math.round(pct) + "%";
-  // пока курсор держит точку из прошлого, свежий замер её не подменяет:
-  // он тихо ложится в историю, линия достраивается, плитка не дёргается
-  if (!probing[key]){
-    const s = state(pct);
-    setState(key, s.cls);
-    $(key + "-state").textContent = s.word;
-    $(key + "-val").textContent = Math.round(pct) + "%";
-    $(key + "-sub").textContent = sub;
-    $(key + "-bar").style.width = Math.max(0, Math.min(100, pct)) + "%";
+  if (cfg.link){
+    var link = document.createElement("a");
+    link.className = "caps hide-sm";
+    link.style.marginLeft = "auto";
+    link.href = "/cluster";
+    link.setAttribute("data-go", "cluster");
+    link.textContent = "подробнее в разделе «Кластер» →";
+    strip.append(link);
   }
 
-  const a = hist[key];
-  a.push({ v: pct, sub: sub, t: new Date() });
-  if (a.length > HIST) a.shift();
-  spark(key + "-spark", a.map(q => q.v));
-  $(key + "-hist").textContent = OFFLINE
-    ? "пример линии — страница открыта файлом, бэкенда рядом нет"
-    : "за эту вкладку: " + a.length + " из " + HIST + " точек, шаг 15 с";
-}
+  var chart = document.createElement("div");
+  chart.className = "chart";
+  var svg = document.createElementNS(SVGNS, "svg");
+  svg.setAttribute("viewBox", "0 0 " + SPW + " " + h);
+  svg.setAttribute("preserveAspectRatio", "none");
+  svg.setAttribute("aria-hidden", "true");
+  svg.style.height = h + "px";
 
-let t = 0;
-function demo(){
-  t += 1;
-  const cpu = 31 + Math.sin(t/3)*9 + Math.sin(t/1.7)*4;
-  const ram = 68 + Math.sin(t/5)*6;
-  draw("cpu", cpu, (cpu*0.06).toFixed(2) + " из 6 ядер");
-  draw("ram", ram, (ram*0.155).toFixed(1) + " из 15.5 ГБ");
-  $("m-demo").style.display = "";
-  $("m-foot").style.display = "none";   // ярлык «демо» уже всё сказал
-}
-function real(d){
-  $("m-demo").style.display = "none";
-  $("m-foot").style.display = "";
-  $("m-foot").textContent = "Источник — Prometheus · обновлено " +
-    new Date().toLocaleTimeString("ru-RU",{hour:"2-digit",minute:"2-digit"});
-  draw("cpu", d.cpu.pct, d.cpu.used + " из " + d.cpu.total + " ядер");
-  draw("ram", d.ram.pct, d.ram.used + " из " + d.ram.total + " ГБ");
-}
-function tickMetrics(){
-  if (OFFLINE) return demo();
-  fetch("/api/metrics", { cache:"no-store" })
-    .then(r => r.ok ? r.json() : Promise.reject()).then(real, demo);
-}
-
-/* Открыто файлом — заполняем линию сразу, иначе смотреть не на что.
-   И раздвигаем метки времени назад с шагом 15 секунд: иначе при наведении
-   вся линия показывала бы одну и ту же минуту. */
-if (OFFLINE){
-  for (let i = 0; i < HIST; i++) demo();
-  const now = Date.now();
-  ["cpu","ram"].forEach(k => hist[k].forEach((p, i, a) => {
-    p.t = new Date(now - (a.length - 1 - i) * 15000);
-  }));
-}
-tickMetrics();
-setInterval(tickMetrics, 15000);
-
-/* ══════════════════════════════════════════════════════════════════════
-   Лента, вход, публикация
-   ══════════════════════════════════════════════════════════════════════ */
-/* Текст из базы вставляем как ТЕКСТ, а не как разметку: даже если в
-   заголовок попадёт <script>, он покажется буквами. */
-const esc = t => { const d = document.createElement("div"); d.textContent = t; return d.innerHTML; };
-const day = iso => { const d = new Date(iso);
-  return String(d.getDate()).padStart(2,"0") + "." + String(d.getMonth()+1).padStart(2,"0"); };
-
-async function api(path, opts){
-  const r = await fetch(path, Object.assign({ cache:"no-store" }, opts));
-  let body = null; try { body = await r.json(); } catch(e){}
-  return { ok:r.ok, status:r.status, body };
-}
-
-function renderFeed(items){
-  $("hs-news").textContent = items.length;
-  $("feed").innerHTML = items.length ? items.map(n => {
-    const sys = n.source === "system";
-    return '<article class="item">' +
-      '<div class="item-h">' +
-        '<span class="who ' + (sys?"sys":"man") + '">' + (sys?"система":"вручную") + '</span>' +
-        '<h3>' + esc(n.title) + '</h3>' +
-        '<span class="when">' + day(n.created_at) + '</span>' +
-      '</div><p>' + esc(n.body) + '</p></article>';
-  }).join("") : '<div class="feed-msg">Пока пусто. Первая запись появится здесь.</div>';
-}
-
-const DEMO_NEWS = [
-  { source:"manual", title:"Первая запись руками", created_at:"2026-08-05T12:00:00",
-    body:"Эта строка написана из-под учётки администратора, а не кластером." },
-  { source:"system", title:"Хаб развёрнут в кластере", created_at:"2026-08-05T09:00:00",
-    body:"Бэкенд на FastAPI, база в PostgreSQL, образ из своего реестра." }
-];
-
-async function loadFeed(){
-  if (OFFLINE) return renderFeed(DEMO_NEWS);
-  const r = await api("/api/news");
-  if (r.ok) renderFeed(r.body);
-  else $("feed").innerHTML = '<div class="feed-msg">Лента недоступна: бэкенд не отвечает.</div>';
-}
-
-function applyRole(){
-  const guest = ME.role === "guest";
-  $("auth-guest").classList.toggle("hidden", !guest);
-  $("auth-user").classList.toggle("hidden", guest);
-  $("compose").classList.toggle("hidden", ME.role !== "admin");
-  $("auth-btn-label").textContent = guest ? "Войти" : ME.login;
-  if (!guest){
-    $("u-name").textContent = ME.login;
-    $("u-role").textContent = ME.role === "admin" ? "администратор" : "читатель";
-  }
-  renderServices();
-}
-
-async function refreshMe(){
-  if (!OFFLINE){ const r = await api("/api/me"); ME = r.ok ? r.body : { login:"", role:"guest" }; }
-  applyRole();
-}
-
-$("login").addEventListener("submit", async e => {
-  e.preventDefault();
-  const msg = $("lmsg"), login = $("user").value.trim().slice(0, 64), password = $("pass").value.slice(0, 200);
-  if (!login || !password){ msg.className = "msg on"; msg.textContent = "Заполни оба поля."; return; }
-  if (OFFLINE){ msg.className = "msg on"; msg.textContent = "Страница открыта файлом — входить некуда."; return; }
-  const r = await api("/api/login", { method:"POST", headers:{"Content-Type":"application/json"},
-                                      body:JSON.stringify({ login, password }) });
-  if (r.ok){ msg.className = "msg"; msg.textContent = ""; $("pass").value = "";
-             ME = r.body; applyRole(); loadFeed();
-             if (AUTHDROP) AUTHDROP.shut(0); }
-  else { msg.className = "msg on"; msg.textContent = (r.body && r.body.detail) || "Не удалось войти."; }
-});
-
-$("u-quit").addEventListener("click", async () => {
-  await api("/api/logout", { method:"POST" });
-  ME = { login:"", role:"guest" }; $("user").value = ""; applyRole();
-  if (AUTHDROP) AUTHDROP.shut(0);
-});
-
-/* Смена пароля и отзыв чужих входов. Оба действия просят текущий пароль:
-   cookie может быть краденой, а пароля у вора нет. */
-const why = r => (r.body && typeof r.body.detail === "string") ? r.body.detail : "Не получилось.";
-
-$("pwd").addEventListener("submit", async e => {
-  e.preventDefault();
-  const msg = $("pmsg"), oldp = $("p-old").value, newp = $("p-new").value;
-  if (OFFLINE){ msg.className = "msg on"; msg.textContent = "Страница открыта файлом — менять негде."; return; }
-  if (!oldp || !newp){ msg.className = "msg on"; msg.textContent = "Заполни оба поля."; return; }
-  if (newp.length < 10){ msg.className = "msg on"; msg.textContent = "Новый пароль короче десяти знаков."; return; }
-  const r = await api("/api/password", { method:"POST", headers:{"Content-Type":"application/json"},
-                                         body:JSON.stringify({ old_password:oldp, new_password:newp }) });
-  msg.className = r.ok ? "msg" : "msg on";
-  msg.textContent = r.ok ? "Пароль изменён, остальные входы сброшены." : why(r);
-  if (r.ok){ $("p-old").value = ""; $("p-new").value = ""; }
-});
-
-$("u-revoke").addEventListener("click", async () => {
-  const msg = $("pmsg"), pwd = $("p-old").value;
-  if (OFFLINE){ msg.className = "msg on"; msg.textContent = "Страница открыта файлом — сбрасывать нечего."; return; }
-  if (!pwd){ msg.className = "msg on"; msg.textContent = "Введи текущий пароль в поле выше."; return; }
-  const r = await api("/api/sessions/revoke", { method:"POST", headers:{"Content-Type":"application/json"},
-                                                body:JSON.stringify({ password:pwd }) });
-  msg.className = r.ok ? "msg" : "msg on";
-  msg.textContent = r.ok ? "Остальные входы сброшены." : why(r);
-  if (r.ok) $("p-old").value = "";
-});
-
-$("compose").addEventListener("submit", async e => {
-  e.preventDefault();
-  const title = $("c-title").value.trim(), body = $("c-body").value.trim();
-  const hint = $("c-hint"), send = $("c-send");
-  if (!title || !body){ hint.textContent = "Заголовок и текст обязательны."; return; }
-  send.disabled = true; hint.textContent = "Отправляю…";
-  const r = await api("/api/news", { method:"POST", headers:{"Content-Type":"application/json"},
-                                     body:JSON.stringify({ title, body }) });
-  send.disabled = false;
-  if (r.ok){ $("c-title").value = ""; $("c-body").value = ""; hint.textContent = "Опубликовано."; loadFeed(); }
-  else hint.textContent = (r.body && r.body.detail) || "Не получилось опубликовать.";
-});
-
-refreshMe();
-loadFeed();
-
-/* ══════════════════════════════════════════════════════════════════════
-   Палитра команд — Ctrl+K
-   ══════════════════════════════════════════════════════════════════════ */
-(function(){
-  const pal = $("pal"), scrim = $("pal-scrim"), inp = $("pal-input"), list = $("pal-list");
-  let items = [], cur = 0, open = false;
-
-  const targets = () => SERVICES
-    .filter(s => !(s.infra && ME.role === "guest"))
-    .map(s => ({ ic:s.ic, name:s.name, sub:s.d, act:() => location.href = s.url }))
-    .concat([
-      { ic:"📰", name:"Перейти к ленте",     sub:"раздел на этой странице", act:()=>jump("#s-feed") },
-      { ic:"📈", name:"Перейти к кластеру",  sub:"раздел на этой странице", act:()=>jump("#s-cluster") },
-      { ic:"🧩", name:"Перейти к сервисам",  sub:"раздел на этой странице", act:()=>jump("#s-svc") },
-      { ic:"🔄", name:"Проверить сервисы",   sub:"опросить всё заново",     act:ping }
-    ]);
-
-  function jump(sel){ const el = document.querySelector(sel); if (el) el.scrollIntoView({behavior:"smooth"}); }
-
-  /* Нечёткий поиск: буквы запроса должны встретиться в названии по порядку,
-     но не обязательно подряд — «grf» находит Grafana. */
-  function match(q, s){
-    if (!q) return true;
-    const t = s.toLowerCase(); let i = 0;
-    for (const ch of q.toLowerCase()){ i = t.indexOf(ch, i); if (i < 0) return false; i++; }
-    return true;
-  }
-
-  function render(){
-    const q = inp.value.trim();
-    items = targets().filter(x => match(q, x.name + " " + x.sub));
-    cur = 0;
-    list.innerHTML = items.length
-      ? items.map((x,i) => '<div class="pal-i' + (i===0?" on":"") + '" data-i="' + i + '">' +
-          '<span class="pi-ic">' + x.ic + '</span><b>' + esc(x.name) + '</b>' +
-          '<span class="pi-sub">' + esc(x.sub) + '</span></div>').join("")
-      : '<div class="pal-none">Ничего не нашлось</div>';
-  }
-  function move(d){
-    if (!items.length) return;
-    cur = (cur + d + items.length) % items.length;
-    [...list.children].forEach((el,i) => el.classList.toggle("on", i === cur));
-    const el = list.children[cur]; if (el) el.scrollIntoView({ block:"nearest" });
-  }
-  function show(){ open = true; document.body.classList.add("pal-on"); inp.value = ""; render();
-                   setTimeout(() => inp.focus(), 30); }
-  function hide(){ open = false; document.body.classList.remove("pal-on"); }
-
-  $("pal-open").addEventListener("click", show);
-  scrim.addEventListener("click", hide);
-  inp.addEventListener("input", render);
-  list.addEventListener("click", e => {
-    const el = e.target.closest(".pal-i"); if (!el) return;
-    hide(); items[+el.dataset.i].act();
+  /* Сначала все заливки, потом все линии — иначе заливка второй строки
+     легла бы поверх линии первой. */
+  rows.forEach(function(r){
+    var t = TONE[r.spec.tone];
+    if (!t.fill) return;
+    r.fill = document.createElementNS(SVGNS, "polyline");
+    r.fill.setAttribute("class", t.fill);
+    svg.append(r.fill);
   });
-  document.addEventListener("keydown", e => {
-    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k"){ e.preventDefault(); open ? hide() : show(); return; }
-    if (!open) return;
-    if (e.key === "Escape"){ hide(); }
-    else if (e.key === "ArrowDown"){ e.preventDefault(); move(1); }
-    else if (e.key === "ArrowUp"){ e.preventDefault(); move(-1); }
-    else if (e.key === "Enter"){ e.preventDefault(); if (items[cur]){ hide(); items[cur].act(); } }
+  rows.forEach(function(r){
+    r.line = document.createElementNS(SVGNS, "polyline");
+    r.line.setAttribute("class", TONE[r.spec.tone].line);
+    svg.append(r.line);
+    r.dot = document.createElement("i");
+    r.dot.className = "dot " + TONE[r.spec.tone].dot;
   });
-})();
 
-/* ══════════════════════════════════════════════════════════════════════
-   «Твоя железячка»
-   ══════════════════════════════════════════════════════════════════════ */
-(function(){
-  const put = (id,v) => { $(id).textContent = v; };
-  function tidy(s){
-    const m = s.match(/^ANGLE \((.*)\)$/);
-    if (m){ const p = m[1].split(", "); s = p.length >= 2 ? p[1] : m[1]; }
-    return s.replace(/\s*\((?:0x)?[0-9A-Fa-f]{4,}\)/g, "")
-            .replace(/\s*Direct3D\d+.*$/i, "").replace(/\s*(?:vs|ps)_\d_\d.*$/i, "")
-            .replace(/\s*\/\s*(?:PCIe|SSE2).*$/i, "").replace(/\s+/g," ").trim();
-  }
-  function gpu(){
-    try {
-      const gl = document.createElement("canvas").getContext("webgl");
-      if (!gl) return "WebGL выключен";
-      const ext = gl.getExtension("WEBGL_debug_renderer_info");
-      if (!ext) return "браузер скрывает модель";
-      return tidy(gl.getParameter(ext.UNMASKED_RENDERER_WEBGL)) || "не разобрал ответ";
-    } catch(e){ return "не удалось определить"; }
-  }
-  function cpu(arch, bits){
-    const n = navigator.hardwareConcurrency;
-    const left = [arch, bits].filter(Boolean).join(" ");
-    const word = n ? (n%10===1 && n%100!==11 ? "поток" :
-        (n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? "потока" : "потоков")) : "";
-    return [left, n ? n + " " + word : ""].filter(Boolean).join(" · ") || "браузер не говорит";
-  }
-  put("r-gpu", gpu());
-  put("r-scr", screen.width + " × " + screen.height + " · " +
-      (Math.round((window.devicePixelRatio||1)*100)/100) + "x");
-  put("r-cpu", cpu());
-  if (navigator.userAgentData && navigator.userAgentData.getHighEntropyValues)
-    navigator.userAgentData.getHighEntropyValues(["architecture","bitness"])
-      .then(d => put("r-cpu", cpu(d.architecture, d.bitness && d.bitness + "-бит"))).catch(()=>{});
-})();
+  chart.append(svg);
+  var cur = document.createElement("i");
+  cur.className = "cursor";
+  chart.append(cur);
+  rows.forEach(function(r){ chart.append(r.dot); });
 
-/* ══════════════════════════════════════════════════════════════════════
-   Выпадающая панель сервисов в шапке
-   ══════════════════════════════════════════════════════════════════════ */
-function makeDrop(wrapId, btnId, opts){
+  host.append(strip, chart);
+
+  var note = null;
+  if (cfg.note !== undefined){
+    note = document.createElement("p");
+    note.className = "note mono";
+    host.append(note);
+  }
+
+  var probe = null;   /* индекс под курсором; null — курсора нет */
+
+  function draw(){
+    var n = rows[0].spec.data().length;
+
+    /* Подпись обновляется всегда — даже когда рисовать нечего. Пустой график
+       без объяснения выглядит поломкой; с подписью «жду первый замер» или
+       «Prometheus недоступен» он выглядит честным. */
+    if (note) note.textContent = noteText(n);
+
+    if (!n){
+      rows.forEach(function(r){
+        r.num.textContent = "—";
+        r.sub.textContent = r.spec.label;
+        r.dot.style.opacity = "0";
+      });
+      at.textContent = "";
+      cur.style.opacity = "0";
+      return;
+    }
+
+    var on  = probe !== null && probe < n;
+    var idx = on ? probe : n - 1;
+
+    rows.forEach(function(r){
+      var data = r.spec.data();
+      var g = geom(data.map(function(q){ return q.v; }), h);
+      var pts = points(data, g);
+      r.line.setAttribute("points", pts);
+      if (r.fill) r.fill.setAttribute("points", "0," + h + " " + pts + " " + g.x(data.length - 1).toFixed(1) + "," + h);
+
+      r.num.textContent = Math.round(data[idx].v) + "%";
+      /* Если название метрики уже стоит в подписи слева (prefix), в строке
+         после числа его не повторяем: «процессор · процессор · 2.19». */
+      r.sub.textContent = (cfg.prefix ? "" : r.spec.label + " · ") + data[idx].sub +
+        (cfg.word ? " · " + word(data[idx].v) : "");
+
+      r.dot.style.opacity = on ? "1" : "0";
+      r.dot.style.left    = (g.x(idx) / SPW * 100) + "%";
+      r.dot.style.top     = (g.y(data[idx].v) / h * 100) + "%";
+    });
+
+    var t = rows[0].spec.data()[idx].t
+      .toLocaleTimeString("ru-RU", { hour:"2-digit", minute:"2-digit" });
+    at.textContent = (cfg.prefix ? cfg.prefix + " · " : "") + (on ? "замер в " + t : "сейчас, " + t);
+
+    cur.style.opacity = on ? "0.55" : "0";
+    cur.style.left    = (idx * (100 / Math.max(1, n - 1))) + "%";
+  }
+
+  host.addEventListener("pointermove", function(e){
+    var r = chart.getBoundingClientRect();
+    var frac = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
+    probe = Math.round(frac * (rows[0].spec.data().length - 1));
+    draw();
+  });
+  host.addEventListener("pointerleave", function(){ probe = null; draw(); });
+
+  return { draw:draw };
+}
+
+/* Строки передаются функциями, а не массивами: на шаге 4 история начнёт
+   обновляться каждые 15 секунд, и график должен видеть свежий массив, а не
+   тот, что был на момент создания. */
+var cpuRow   = { data:function(){ return hist.cpu; }, label:"процессор", tone:"acc" };
+var ramFaint = { data:function(){ return hist.ram; }, label:"память",    tone:"faint" };
+var ramSolo  = { data:function(){ return hist.ram; }, label:"память",    tone:"ink" };
+
+var NOTE_HOME = "";   /* подпись пересобирается в noteText() */
+
+var charts = {
+  home:  makeChart(document.getElementById("chartHome"),
+           { rows:[cpuRow, ramFaint], link:true, note:NOTE_HOME }),
+  guest: makeChart(document.getElementById("chartGuest"),
+           { rows:[cpuRow, ramFaint], note:NOTE_HOME }),
+  cpu:   makeChart(document.getElementById("chartCpu"),
+           { rows:[cpuRow], height:130, tall:true, word:true, top:true, prefix:"процессор" }),
+  ram:   makeChart(document.getElementById("chartRam"),
+           { rows:[ramSolo], height:130, tall:true, word:true, top:true, prefix:"память" })
+};
+document.getElementById("chartCpu").style.paddingTop = "16px";
+document.getElementById("chartRam").style.paddingTop = "16px";
+document.getElementById("chartRam").style.marginTop  = "22px";
+
+/* ── Отрисовка списков ────────────────────────────────────────────────────
+   Всё, что приходит из данных, ставится через textContent. Даже если в
+   заголовок записи попадёт <script>, он покажется буквами. Писать в ленту
+   могут только админ и кластер, но полагаться на «сюда плохие не ходят» —
+   плохая привычка. */
+
+function svcRow(s){
+  var a = document.createElement("a");
+  a.className = "svc";
+  a.href = s.url;
+
+  var n = document.createElement("span");
+  n.className = "n";
+  n.textContent = s.n;
+
+  var nm = document.createElement("span");
+  nm.className = "name";
+  var ic = document.createElement("i");
+  ic.textContent = s.ic;
+  var b = document.createElement("b");
+  b.textContent = s.name;
+  nm.append(ic, b);
+
+  var d = document.createElement("span");
+  d.className = "d";
+  d.textContent = s.d;
+
+  var meta = document.createElement("span");
+  meta.className = "meta";
+  var host = document.createElement("span");
+  host.textContent = s.sub;
+  host.title = s.host;
+  var st = document.createElement("span");
+  st.className = s.state === "up" ? "st-up" : s.state === "down" ? "st-down" : "";
+  st.textContent = s.state === "up" ? "на линии" : s.state === "down" ? "не отвечает" : "проверяю";
+  meta.append(host, st);
+
+  a.append(n, nm, d, meta);
+  return a;
+}
+
+function entryCard(e, wide){
+  var art = document.createElement("article");
+  art.className = wide ? "jrow" : "entry";
+
+  var when = document.createElement("div");
+  when.className = "when";
+  var at = document.createElement("span");
+  at.textContent = e.at;
+  var tag = document.createElement("span");
+  tag.textContent = e.src === "manual" ? "вручную" : "система";
+  if (e.src === "manual") tag.className = "tag-hand";
+  when.append(at, tag);
+
+  var h3 = document.createElement("h3");
+  h3.textContent = e.title;
+  var p = document.createElement("p");
+  p.textContent = e.body;
+
+  if (wide){
+    var body = document.createElement("div");
+    body.append(h3, p);
+    art.append(when, body);
+  } else {
+    art.append(when, h3, p);
+  }
+  return art;
+}
+
+function fill(node, list, make){
+  node.textContent = "";
+  list.forEach(function(x){ node.append(make(x)); });
+}
+
+/* ── Полная перерисовка ───────────────────────────────────────────────────
+   Одна функция на все разделы. Вызывается при загрузке и при смене роли —
+   а шагом 4 ещё и при каждом ответе бэкенда. */
+
+function redraw(){
+  var svc     = visibleServices();
+  var up      = svc.filter(function(s){ return s.state === "up"; }).length;
+  var waiting = svc.some(function(s){ return s.state === "wait"; });
+  var guest   = me.role === "guest";
+  var admin   = me.role === "admin";
+  var lastDay = NEWS[0].at.split(" · ")[0];
+
+  /* шапка */
+  var healthLine = waiting ? "проверяю…" : up + " из " + svc.length + " на линии";
+  document.getElementById("healthText").textContent = healthLine;
+  document.getElementById("health").className = "health " + (waiting ? "" : up === svc.length ? "up" : "down");
+  document.getElementById("enter").textContent =
+    guest ? "Войти" : (me.login || "вход") + " · " + (admin ? "админ" : "читатель") + " · выйти";
+
+  /* «Выпуск от» — дата последней записи, а не сегодняшняя: выпуск газеты
+     датируется тем, когда в неё в последний раз что-то написали. */
+  document.getElementById("issue").textContent =
+    "выпуск от " + (NEWS.length ? NEWS[0].at.split(" · ")[0] : "—");
+
+  /* главная */
+  fill(document.getElementById("homeSvc"), svc.slice(0, 3), svcRow);
+  fill(document.getElementById("homeNews"), NEWS.slice(0, 2), function(e){ return entryCard(e, false); });
+  document.getElementById("sumSvc").textContent  = healthLine;
+  document.getElementById("sumNews").textContent = NEWS.length + ", последняя " + lastDay;
+  document.getElementById("allSvcLink").textContent =
+    "все " + svc.length + " " + plural(svc.length, "адрес", "адреса", "адресов") + " →";
+
+  /* сервисы */
+  var groups = [
+    { title:"Сайты · открыты всем",        items:svc.filter(function(s){ return s.group === "sites"; }) },
+    { title:"Инфраструктура · после входа", items:svc.filter(function(s){ return s.group === "infra"; }) }
+  ].filter(function(g){ return g.items.length; });
+
+  var box = document.getElementById("svcGroups");
+  box.textContent = "";
+  groups.forEach(function(g){
+    var wrap = document.createElement("div");
+    wrap.className = "grp";
+    var t = document.createElement("span");
+    t.className = "caps";
+    t.textContent = g.title;
+    wrap.append(t);
+    g.items.forEach(function(s){ wrap.append(svcRow(s)); });
+    box.append(wrap);
+  });
+
+  document.getElementById("svcUp").textContent = String(up);
+  document.getElementById("svcUpNote").textContent = "из " + svc.length +
+    (waiting ? " · проверяю" : " отвечают · проверено только что");
+
+  var gn = document.getElementById("svcGuestNote");
+  gn.hidden = !guest;
+  gn.textContent = "служебные панели скрыты — их " + INFRA.length +
+    ". это опрятность, а не защита: сервисы закрыты своими паролями. войди, чтобы увидеть список целиком.";
+
+  /* журнал */
+  fill(document.getElementById("newsFeed"), NEWS, function(e){ return entryCard(e, true); });
+  document.getElementById("newsCount").textContent = String(NEWS.length);
+  document.getElementById("newsNote").textContent =
+    plural(NEWS.length, "запись", "записи", "записей") + " · последняя " + lastDay;
+  document.getElementById("newsForm").hidden = !admin;
+
+  /* кластер: гостю сводная линия, вошедшему две раздельные */
+  document.getElementById("chartGuest").hidden = !guest;
+  document.getElementById("clusterGuestNote").hidden = !guest;
+  document.getElementById("chartCpu").hidden = guest;
+  document.getElementById("chartRam").hidden = guest;
+
+  redrawCharts();
+}
+
+function redrawCharts(){
+  Object.keys(charts).forEach(function(k){ charts[k].draw(); });
+}
+
+/* ── Разговор с бэкендом ──────────────────────────────────────────────────
+   Одна функция на все запросы. Она же переводит ошибку бэкенда в понятный
+   текст: FastAPI кладёт причину в поле detail, и показать её человеку куда
+   полезнее, чем «ошибка 401».
+
+   credentials:"same-origin" — чтобы к запросу прикладывалась cookie сессии.
+   Браузеры и так делают это для своего же адреса, но полагаться на умолчание,
+   которое несколько лет назад было другим, не стоит. */
+
+function api(path, opts){
   opts = opts || {};
-  const wrap = $(wrapId), btn = $(btnId);
-  let open = false, shutTimer = null;
-
-  function show(){
-    clearTimeout(shutTimer);
-    if (open) return;
-    open = true;
-    wrap.classList.add("on");
-    btn.setAttribute("aria-expanded", "true");
-    if (opts.onShow) opts.onShow();
-  }
-  /* Пауза перед закрытием: курсор идёт от кнопки к панели по диагонали и
-     на долю секунды оказывается вне обоих — без задержки меню моргает. */
-  function shut(delay){
-    clearTimeout(shutTimer);
-    shutTimer = setTimeout(() => {
-      open = false;
-      wrap.classList.remove("on");
-      btn.setAttribute("aria-expanded", "false");
-    }, delay || 0);
-  }
-
-  if (opts.hover){
-    wrap.addEventListener("pointerenter", e => { if (e.pointerType !== "touch") show(); });
-    wrap.addEventListener("pointerleave", e => { if (e.pointerType !== "touch") shut(220); });
-    wrap.addEventListener("focusin", show);
-    wrap.addEventListener("focusout", () => {
-      setTimeout(() => { if (!wrap.contains(document.activeElement)) shut(0); }, 0);
+  return fetch(path, {
+    method: opts.method || "GET",
+    credentials: "same-origin",
+    headers: opts.body ? { "Content-Type":"application/json" } : {},
+    body: opts.body ? JSON.stringify(opts.body) : undefined
+  }).then(function(r){
+    if (r.ok) return r.status === 204 ? null : r.json();
+    return r.json().catch(function(){ return {}; }).then(function(j){
+      var e = new Error(j.detail || ("бэкенд ответил " + r.status));
+      e.status = r.status;
+      throw e;
     });
-  }
-  btn.addEventListener("click", () => open ? shut(0) : show());
-  document.addEventListener("keydown", e => { if (e.key === "Escape" && open) { shut(0); btn.focus(); } });
-  document.addEventListener("click", e => { if (open && !wrap.contains(e.target)) shut(0); });
-  // ушли по ссылке или к разделу — панель больше не нужна
-  wrap.addEventListener("click", e => { if (e.target.closest("a,[data-jump]")) shut(0); });
-
-  return { show, shut, isOpen: () => open };
+  });
 }
 
-// сервисы — по наведению; вход — только по клику, из формы легко увести курсор
-makeDrop("navdrop", "drop-btn", { hover:true });
-AUTHDROP = makeDrop("authdrop", "auth-btn", {
-  onShow(){ const f = $("user"); if (f && ME.role === "guest") setTimeout(() => f.focus(), 40); }
+/* ── Лента ────────────────────────────────────────────────────────────────
+   Бэкенд отдаёт время в ISO, странице нужно «15.08 · 21:40». Перевод здесь,
+   а не в бэкенде: формат — дело того, кто показывает. */
+
+function fmtAt(iso){
+  var d = new Date(iso);
+  return d.toLocaleDateString("ru-RU", { day:"2-digit", month:"2-digit" }) + " · " +
+         d.toLocaleTimeString("ru-RU", { hour:"2-digit", minute:"2-digit" });
+}
+
+function loadNews(){
+  if (DEMO) return Promise.resolve();
+  return api("/api/news?limit=20").then(function(rows){
+    NEWS = rows.map(function(r){
+      return { id:r.id, at:fmtAt(r.created_at), src:r.source, title:r.title, body:r.body };
+    });
+    redraw();
+  }).catch(function(){ /* лента не пришла — остаётся та, что была */ });
+}
+
+/* ── Метрики ──────────────────────────────────────────────────────────────
+   Замер каждые 15 секунд, шестьдесят точек, история копится в самой вкладке:
+   бэкенд помнит только «сейчас». Каждая точка хранит и расшифровку, и время —
+   иначе под курсором нечего было бы показать. */
+
+var metricsFail = 0;
+
+function pushMetrics(m){
+  var t = new Date();
+  hist.cpu.push({ v:m.cpu.pct, sub:m.cpu.used + " из " + m.cpu.total + " ядер", t:t });
+  hist.ram.push({ v:m.ram.pct, sub:m.ram.used + " из " + m.ram.total + " ГБ",  t:t });
+  if (hist.cpu.length > HIST){ hist.cpu.shift(); hist.ram.shift(); }
+}
+
+function loadMetrics(){
+  if (DEMO) return Promise.resolve();
+  return api("/api/metrics").then(function(m){
+    metricsFail = 0;
+    pushMetrics(m);
+    redrawCharts();
+  }).catch(function(){
+    /* 503 значит «Prometheus недоступен», а не «хаб сломался». Линию не
+       трогаем: пусть висит последняя известная, но подпись говорит правду. */
+    metricsFail++;
+    redrawCharts();
+  });
+}
+
+function noteText(n){
+  if (DEMO) return "демо · страница открыта с диска, числа выдуманы, к бэкенду обращений нет";
+  if (metricsFail) return "метрики не приходят — Prometheus недоступен" +
+    (n ? " · показано последнее, что успели снять" : "");
+  if (!n) return "жду первый замер…";
+  if (n < HIST) return "набрано " + n + " " + plural(n, "точка", "точки", "точек") +
+    " из 60 · шаг 15 секунд · история копится в этой вкладке";
+  return "последние 15 минут · шаг 15 секунд · история копится в этой вкладке, конец линии — сейчас";
+}
+
+/* ── Кто я ────────────────────────────────────────────────────────────────
+   Роль приходит с бэкенда по cookie. Спрашивать её у формы входа нельзя:
+   права — свойство учётной записи, а не галочки на странице. */
+
+function loadMe(){
+  if (DEMO) return Promise.resolve();
+  return api("/api/me").then(function(u){
+    me = { login:u.login, role:u.role };
+    redraw();
+  }).catch(function(){});
+}
+
+/* ── Вход и выход ──────────────────────────────────────────────────────── */
+
+var authBox = document.getElementById("authBox");
+var authErr = document.getElementById("authErr");
+
+function toggleAuth(open){
+  authBox.hidden = open === false ? true : (open === true ? false : !authBox.hidden);
+  authErr.textContent = "";
+  if (!authBox.hidden) document.getElementById("authLogin").focus();
+}
+
+document.getElementById("enter").addEventListener("click", function(e){
+  e.preventDefault();
+  if (me.role === "guest"){ toggleAuth(); return; }
+  if (DEMO){ me = { login:"", role:"guest" }; redraw(); return; }
+  api("/api/logout", { method:"POST" })
+    .then(function(){ me = { login:"", role:"guest" }; redraw(); loadNews(); probeAll(); });
 });
 
-/* ── Появление секций при скролле ────────────────────────────────── */
-(function(){
-  if (!("IntersectionObserver" in window)) return;
-  const io = new IntersectionObserver(es => es.forEach(e => {
-    if (e.isIntersecting){ e.target.classList.add("seen"); io.unobserve(e.target); }
-  }), { rootMargin:"0px 0px -12% 0px" });
-  document.querySelectorAll(".block, .card").forEach(el => io.observe(el));
-})();
+document.getElementById("authForm").addEventListener("submit", function(e){
+  e.preventDefault();
+  var login = document.getElementById("authLogin").value;
+  var pass  = document.getElementById("authPass").value;
+  if (!login || !pass) return;
+  authErr.textContent = "проверяю…";
 
-/* ── Шапка прилипает и тускнеет при скролле ──────────────────────── */
-(function(){
-  let ticking = false;
-  addEventListener("scroll", () => {
-    if (ticking) return; ticking = true;
-    requestAnimationFrame(() => {
-      document.body.classList.toggle("scrolled", scrollY > 24);
-      document.documentElement.style.setProperty("--sy", Math.min(1, scrollY / 600).toFixed(3));
-      ticking = false;
-    });
-  }, { passive:true });
-})();
-</script>
-
-<script>
-/* Одна кнопка по кругу переключает три настроения. Меняется только класс
-   на <body> — весь цвет страницы висит на переменных, так что ничего
-   перерисовывать руками не нужно. Выбор запоминается. */
-(function(){
-  const MOODS = [
-    ["m-dark",  "Мягкий тёмный"],
-    ["m-light", "Светлый"],
-    ["m-warm",  "Тёплый"]
-  ];
-  const btn = document.getElementById("mood-btn");
-  const name = document.getElementById("mood-name");
-  let i = Math.max(0, MOODS.findIndex(m => m[0] === store.getItem("mood")));
-
-  function apply(){
-    MOODS.forEach(m => document.body.classList.remove(m[0]));
-    document.body.classList.add(MOODS[i][0]);
-    name.textContent = MOODS[i][1];
-    store.setItem("mood", MOODS[i][0]);
+  if (DEMO){
+    me = { login:login, role:"admin" };
+    document.getElementById("authPass").value = "";
+    toggleAuth(false); redraw();
+    return;
   }
-  apply();
-  btn.addEventListener("click", () => { i = (i + 1) % MOODS.length; apply(); });
 
-  /* с клавиатуры — латинская M и русская Ь на той же клавише */
-  addEventListener("keydown", e => {
-    if (e.ctrlKey || e.metaKey || e.altKey) return;
-    if (/^(m|ь)$/i.test(e.key) && !/^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName))
-      btn.click();
+  api("/api/login", { method:"POST", body:{ login:login, password:pass } })
+    .then(function(u){
+      me = { login:u.login, role:u.role };
+      document.getElementById("authPass").value = "";
+      toggleAuth(false);
+      redraw();
+      loadNews();
+      probeAll();
+    })
+    .catch(function(err){ authErr.textContent = err.message; });
+});
+
+/* ── Форма записи ─────────────────────────────────────────────────────────
+   Бэкенд сам решит, чей это будет ярлык: пришли по cookie админа — «вручную»
+   с твоим именем, пришли с токеном кластера — «система». Страница про это
+   не спорит, она только показывает ответ. */
+
+document.getElementById("newsForm").addEventListener("submit", function(e){
+  e.preventDefault();
+  var title = document.getElementById("newsTitle").value.trim();
+  var body  = document.getElementById("newsBody").value.trim();
+  if (!title || !body) return;
+
+  function clear(){
+    document.getElementById("newsTitle").value = "";
+    document.getElementById("newsBody").value  = "";
+  }
+
+  if (DEMO){
+    NEWS.unshift({ at:fmtAt(new Date().toISOString()), src:"manual", title:title, body:body });
+    clear(); redraw();
+    return;
+  }
+
+  api("/api/news", { method:"POST", body:{ title:title, body:body } })
+    .then(function(r){
+      NEWS.unshift({ id:r.id, at:fmtAt(r.created_at), src:r.source, title:r.title, body:r.body });
+      clear(); redraw();
+    })
+    .catch(function(err){ alertLine(err.message); });
+});
+
+/* Сообщение об ошибке строкой под формой, а не alert: диалог браузера
+   останавливает страницу и выглядит чужеродно. */
+function alertLine(text){
+  var box = document.getElementById("newsForm");
+  var line = box.querySelector(".err");
+  if (!line){
+    line = document.createElement("span");
+    line.className = "err mono";
+    line.style.cssText = "font-size:.72rem;color:var(--bad)";
+    box.querySelector(".foot-row").append(line);
+  }
+  line.textContent = text;
+}
+
+/* ── Пробы сервисов ───────────────────────────────────────────────────────
+   Проверка идёт из браузера, а не с бэкенда: так видно ровно то, что видит
+   гость со своего места. Запрос уходит с mode:"no-cors" — ответ приходит
+   непрозрачным, прочитать из него ничего нельзя, и это нормально: нам нужен
+   сам факт «по сети что-то ответило».
+
+   Отсюда важная оговорка: зелёный кружок означает «сервис на линии», а не
+   «сервис здоров». 401 и 403 тоже считаются ответом — дверь есть, она просто
+   заперта.
+
+   У Cockpit проверка корня режется заголовком Cross-Origin-Resource-Policy,
+   поэтому у него отдельный адрес пробы — /ping. Он лежит в данных рядом с
+   остальными полями и на шаге про базу станет обычной колонкой. */
+
+var PROBE_EVERY = 30000, PROBE_TIMEOUT = 5000;
+
+function probeOne(url, key){
+  var ctl = new AbortController();
+  var stop = setTimeout(function(){ ctl.abort(); }, PROBE_TIMEOUT);
+  return fetch(url, { mode:"no-cors", cache:"no-store", credentials:"omit", signal:ctl.signal })
+    .then(function(){ return true; })
+    .catch(function(){ return false; })
+    .then(function(ok){ clearTimeout(stop); probeState[key] = ok; });
+}
+
+function probeAll(){
+  if (DEMO) return;
+  /* Спрашиваем только то, что человек видит: гостю незачем стучаться в восемь
+     служебных панелей. И только по разу на адрес — иначе на каждом круге
+     уходило бы двадцать два запроса вместо одиннадцати. */
+  var seen = {}, list = [];
+  visibleServices().forEach(function(s){
+    if (seen[s.host]) return;
+    seen[s.host] = true;
+    list.push(s);
   });
-})();
+  Promise.all(list.map(function(s){
+    return probeOne(s.url + (s.probe || ""), s.host);
+  })).then(redraw);
+}
+
+/* ── Твоя железячка ───────────────────────────────────────────────────────
+   Всё считается во вкладке и никуда не отправляется. Модель процессора
+   браузер не выдаёт принципиально — по ней слишком легко опознать человека;
+   доступны только разрядность, архитектура и число потоков. Видеокарта
+   видна через WebGL. */
+
+function gpuName(){
+  try {
+    var c = document.createElement("canvas");
+    var gl = c.getContext("webgl") || c.getContext("experimental-webgl");
+    if (!gl) return null;
+    var dbg = gl.getExtension("WEBGL_debug_renderer_info");
+    var raw = String(dbg ? gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER));
+    /* Chrome отдаёт это через ANGLE и с довеском вида
+       "ANGLE (Intel, Intel(R) UHD Graphics 730 Direct3D11 vs_5_0 ps_5_0, D3D11)".
+       Человеку нужна середина. */
+    var m = /^ANGLE \(([^,]+),\s*([^,]+?)(?:\s+Direct3D.*)?(?:,\s*[^,]+)?\)$/.exec(raw);
+    var name = (m ? m[2] : raw).replace(/\(R\)|\(TM\)/g, "").replace(/\s+/g, " ").trim();
+    /* Если строка всё равно длинная и в скобках — берём то, что до скобки.
+       В подвал не влезет «Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x…))». */
+    if (name.length > 40) name = name.split("(")[0].trim();
+    return name.slice(0, 40);
+  } catch (e){ return null; }
+}
+
+function showRig(){
+  var box = document.getElementById("rigFacts");
+  var bits = [];
+
+  function paint(arch){
+    bits = [];
+    var threads = navigator.hardwareConcurrency;
+    if (arch) bits.push(arch + (threads ? " · " + threads + " " + plural(threads, "поток", "потока", "потоков") : ""));
+    else if (threads) bits.push(threads + " " + plural(threads, "поток", "потока", "потоков"));
+    var g = gpuName();
+    if (g) bits.push(g);
+    var dpr = window.devicePixelRatio || 1;
+    bits.push(Math.round(screen.width * dpr) + "×" + Math.round(screen.height * dpr));
+
+    box.textContent = "";
+    bits.forEach(function(t, i){
+      if (i){
+        var dot = document.createElement("i");
+        dot.style.cssText = "font-style:normal;opacity:.4;margin:0 8px";
+        dot.textContent = "·";
+        box.append(dot);
+      }
+      var b = document.createElement("b");
+      b.textContent = t;
+      box.append(b);
+    });
+  }
+
+  /* Архитектуру современные браузеры отдают отдельным запросом и не сразу.
+     Если его нет — рисуем без неё, а не ждём вечно. */
+  var ua = navigator.userAgentData;
+  if (ua && ua.getHighEntropyValues){
+    ua.getHighEntropyValues(["architecture", "bitness"])
+      .then(function(v){ paint(v.architecture ? v.architecture + (v.bitness ? "_" + v.bitness : "") : null); })
+      .catch(function(){ paint(null); });
+  } else {
+    paint(navigator.platform || null);
+  }
+}
+
+/* ── Леса для локальной проверки ──────────────────────────────────────────
+   Только в демо-режиме: роль переключается клавишей R (и русской К).
+   По http этот обработчик не вешается — там роль приходит с бэкенда. */
+
+if (DEMO){
+  var ROLES = ["guest", "reader", "admin"];
+  window.addEventListener("keydown", function(e){
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    var t = e.target.tagName;
+    if (t === "INPUT" || t === "TEXTAREA") return;
+    var k = e.key.toLowerCase();
+    if (k !== "r" && k !== "к") return;
+    me = { login:"victor", role:ROLES[(ROLES.indexOf(me.role) + 1) % ROLES.length] };
+    redraw();
+  });
+}
+
+/* ── Запуск ──────────────────────────────────────────────────────────────
+   Первая отрисовка идёт сразу, на том, что есть: страница не должна ждать
+   сеть, чтобы показать хотя бы разметку. Дальше подтягиваются кто я, лента
+   и метрики — каждое само по себе, независимо от остальных. */
+
+redraw();
+showRig();
+loadMe();
+loadNews();
+loadMetrics();
+probeAll();
+if (!DEMO){
+  setInterval(loadMetrics, 15000);
+  setInterval(probeAll, PROBE_EVERY);
+}
+
+/* Смена настроения линии не перерисовывает — и не должна: цвет им задан
+   классами через var(--acc) и var(--ink), а переменные меняются вместе с
+   классом на <body>. В макете цвета стояли прямо в атрибуте style, и там
+   перерисовка была бы нужна. */
 </script>
+
 </body>
 </html>
