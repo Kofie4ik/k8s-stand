@@ -9,8 +9,8 @@ resources:
   - web-deployment.yaml
   - web-service.yaml
   - ingress.yaml
-  # добавится после kubeseal — см. README-hub.md
-  # - sealedsecret.yaml
+  - middlewares.yaml
+  - sealedsecret.yaml
 
 configMapGenerator:
   # Страница едет в кластер как ConfigMap, собранный из файла на лету.
