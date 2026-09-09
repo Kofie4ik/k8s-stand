@@ -1,0 +1,13 @@
+apiVersion: longhorn.io/v1beta2
+kind: RecurringJob
+metadata:
+  name: trim-weekly
+  namespace: longhorn-system
+spec:
+  # воскресенье 03:00 UTC = 06:00 МСК, чтобы не пересекаться с бэкапом в 00:00 UTC
+  cron: "0 3 * * 0"
+  task: filesystem-trim
+  groups:
+    - default
+  retain: 0
+  concurrency: 1
