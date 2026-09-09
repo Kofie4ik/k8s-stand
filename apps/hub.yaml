@@ -16,6 +16,7 @@ spec:
     namespace: hub
   syncPolicy:
     automated:
+      enabled: true
       selfHeal: true
       prune: true
     syncOptions:
